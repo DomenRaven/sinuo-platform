@@ -7,10 +7,19 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from sinuo import __version__
 from sinuo.api.agents.routes import router as agent_router
+from sinuo.api.agents.start import start_router
 from sinuo.api.assets.routes import router as assets_router
+from sinuo.api.assets.uploads import router as upload_router
 from sinuo.api.auth.errors import register_auth_exception_handlers
 from sinuo.api.auth.routes import router as auth_router
+from sinuo.api.candidates.errors import register_candidate_exception_handlers
+from sinuo.api.candidates.routes import router as candidate_router
 from sinuo.api.events.routes import router as events_router
+from sinuo.api.evidence.routes import router as evidence_router
+from sinuo.api.exports.routes import router as export_router
+from sinuo.api.records.routes import router as records_router
+from sinuo.api.reviews.errors import register_review_exception_handlers
+from sinuo.api.reviews.routes import router as review_router
 from sinuo.api.suggestions.errors import register_suggestion_exception_handlers
 from sinuo.api.suggestions.routes import router as suggestion_router
 from sinuo.api.versions.errors import register_version_exception_handlers
@@ -35,14 +44,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Sinuo API", version=__version__, lifespan=lifespan)
     app.state.settings = configuration
     app.include_router(agent_router)
+    app.include_router(start_router())
     app.include_router(auth_router)
     app.include_router(version_router)
+    app.include_router(review_router)
     app.include_router(events_router)
+    app.include_router(export_router)
+    app.include_router(evidence_router)
+    app.include_router(records_router)
     app.include_router(assets_router)
+    app.include_router(upload_router)
     app.include_router(suggestion_router)
+    app.include_router(candidate_router)
     register_auth_exception_handlers(app)
     register_version_exception_handlers(app)
+    register_review_exception_handlers(app)
     register_suggestion_exception_handlers(app)
+    register_candidate_exception_handlers(app)
 
     def not_ready(reason: str) -> JSONResponse:
         return JSONResponse({"status": "not_ready", "reason": reason}, 503)

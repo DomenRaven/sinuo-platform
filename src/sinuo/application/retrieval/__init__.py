@@ -6,6 +6,13 @@ from sinuo.application.retrieval.graph import (
     GraphNode,
     get_graph_neighborhood,
 )
+from sinuo.application.retrieval.methods import (
+    CompareVersionsResult,
+    LookupMethodResult,
+    MethodCardView,
+    compare_versions,
+    lookup_method,
+)
 from sinuo.application.retrieval.search import (
     EvidenceHit,
     SearchEvidenceResult,
@@ -20,16 +27,21 @@ from sinuo.application.retrieval.snapshot import (
 )
 
 __all__ = [
+    "CompareVersionsResult",
     "EvidenceHit",
     "GraphEdge",
     "GraphNeighborhood",
     "GraphNode",
+    "LookupMethodResult",
+    "MethodCardView",
     "PageSnapshot",
     "SearchEvidenceResult",
     "SnapshotEdge",
     "SnapshotNode",
     "VersionSearchStatus",
+    "compare_versions",
     "get_graph_neighborhood",
     "get_page_snapshot",
+    "lookup_method",
     "search_evidence",
 ]

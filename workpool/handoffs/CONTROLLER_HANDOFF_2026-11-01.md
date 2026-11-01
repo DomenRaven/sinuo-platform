@@ -1,5 +1,7 @@
 # 总控交接（2026-11-01）
 
+这份是上午的探针。迁移 head、OpenAPI 和「没有种库脚本」都已过时。下一窗口读 `workpool/handoffs/CONTROLLER_HANDOFF_2026-11-01_CLOSE.md`。
+
 给下一个总控窗口。本文件只记录这次读过的文档、这次跑过的命令，以及源码里有或没有的符号。不要把聊天记忆当成更新的代码状态。不要把 T05–T08 改成 done。不要把同一段进度追加进 `SESSION.md` 或 `BOARD.md`。
 
 用户调整：不做 GLB 和其他 3D 预览、转换、夹具。见 `workpool/handoffs/USER_WAIVE_3D.md`。这只取消 3D，不把 F07 或 T05 验收 5 算成完成。

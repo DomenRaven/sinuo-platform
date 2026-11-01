@@ -1,11 +1,23 @@
 # T11 纵向业务、并发故障与交付验收
 
-- 状态：planned
+- 状态：implementing
 - 依赖：T06、T10 done；夹具与用例可提前只读设计，最终判定等待全部 P0
 - Owner：独立验收；最终发布判定由集成 owner 负责
 - 基线提交或快照：认领时填写
 - 写入范围：`tests/acceptance/` 已认领集成文件、最小演示 CLI、验收与 UI API 交接文档；实现修复退回原 owner 或重新分配
-- 对应门禁：G0–G4 总验收
+- 对应门禁：G0–G4 总验收。2026-11-01 第一段不签通过。
+
+## 2026-11-01 第一段
+
+不标 done。T06、T10 仍不是 done，本卡不能 done。T05、T06、T08 也不在本段改成 done。G0–G4 都写未执行，账在 `workpool/handoffs/T11_GATE_LEDGER_2026-11-01.md`。
+
+```text
+.venv/Scripts/python.exe -m pytest -q tests/acceptance/test_end_to_end.py -o cache_dir=_施工文件/2026-11-01_t11/99_临时文件/pytest-cache --basetemp=_施工文件/2026-11-01_t11/99_临时文件/pytest
+```
+
+退出码 0。1 passed，1 warning。未跑全库。未跑 `live_model`。没有 Git commit。
+
+HTTP 已走：登录、建项目、同一阶段第二张平行页、改草稿、检查点、查看历史、创建分支、审阅意见、导出登记和状态读取。隔离恢复调用了 `restore_snapshot`，先有一次 `backup_snapshot`。上传原件、创建作品、证据锚点、测试记录、启动运行、预览确认、导出包生成、3D 和真实模型记为未执行。
 
 ## 目标
 

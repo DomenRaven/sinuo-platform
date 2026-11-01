@@ -1,6 +1,6 @@
 # T10 授权审阅、快照导出与备份恢复
 
-- 状态：planned
+- 状态：implementing。2026-11-01 授权审阅意见已接上。快照导出已接上。备份恢复已测。不标 done。T05 和 T09 还没 done。
 - 依赖：T05、T09 done
 - Owner：审阅与交付开发；恢复由集成 owner 联合验收
 - 基线提交或快照：认领时填写
@@ -33,3 +33,9 @@
 ## 交接与证据
 
 交出审阅/导出 API、示例包、备份/恢复命令、恢复日志与限制。给 T11 一份含历史分支、受限原件、测试和意见的可重复夹具。对外报告区分“已恢复业务与原件”和“派生预览尚在重建”。
+
+## 进度
+
+2026-11-01 快照导出已接上，仍是 implementing，不标 done。备份恢复没有做。验收第 2、3 条在 `tests/acceptance/test_review_export_recovery.py`。pytest 退出码 0，3 passed。没有新迁移，head 仍是 `0010_evidence_index`。交接见 `workpool/handoffs/T10_EXPORT_SLICE.md`。
+
+2026-11-01 备份恢复已测，仍是 implementing，不标 done。T05 仍是 implementing，T09 仍是 review。验收第 4、5、6 条在同一测试文件。pytest 退出码 0，8 passed，1 warning。没有新迁移，`alembic heads` 退出码 0，只有 `0010_evidence_index`。这一次本地备份 0.05348549998598173 秒，恢复 0.044866500014904886 秒，环境是 Python 3.14.3、Windows-11-10.0.26200-SP0、SQLite 3.50.4。这不是生产承诺。交接见 `workpool/handoffs/T10_BACKUP_SLICE.md`。

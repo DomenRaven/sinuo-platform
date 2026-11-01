@@ -1,6 +1,6 @@
 # T07 证据锚点、检索与方法库
 
-- 状态：implementing。2026-11-01 仍不标 done。已有 `search_evidence`、`get_graph_neighborhood` 和 `get_page_snapshot`。没有 `lookup_method`、`compare_versions`、FTS5，也没有方法卡表。
+- 状态：review。2026-11-01 不标 done。FTS5 重建已测，烟测已实际发出并记下结果。
 - 依赖：T05 done；T06 的实际索引任务在 G2 联合验收时接通
 - Owner：Grok retrieval
 - 基线提交或快照：认领时填写
@@ -63,3 +63,11 @@
 ```
 
 退出码 0。10 passed，0.92s。其中检索文件 6 个，页面快照是后两个。交接见 `workpool/handoffs/T07_PAGE_SNAPSHOT_SLICE.md`。
+
+## 方法卡与版本对比证据（2026-11-01）
+
+状态仍是 implementing。新增迁移 `0009_method_cards`，`down_revision` 是 `0008_ticket_expiry`，单一 head。表 `method_cards` 只追加版本。`lookup_method` 在问题词和适用条件都满足时返回来源、适用条件、输入、步骤、产物和限制；对不上就不返回整张卡，阶段名单独不够。更高的 `version_no` 不会替换一个并不适用的旧版本。`compare_versions` 只接受两个不同的确切版本 id，拒绝 `latest`、`head`、`current` 和 `newest`。缺 id 保持缺失，不读页头代替。作品字节不同只标字节差异，`semantic_claim` 为空。`search_evidence`、`get_page_snapshot`、`get_graph_neighborhood` 的原合同没改。FTS5 和索引重建没做。T07 不标 done。决定见 ADR-006。交接见 `workpool/handoffs/T07_T08_METHODS_RUN_2026-11-01.md`。
+
+## FTS5 与索引重建证据（2026-11-01）
+
+状态仍是 implementing，不标 review，也不标 done。新增迁移 `0010_evidence_index`，`down_revision` 是 `0009_method_cards`，单一 head。真实新增表是 FTS5 虚表 `evidence_excerpt_index`。`application_tables` 记 50，其中 5 张是 SQLite 影子表。三字及以上用 trigram 短语，更短的查询在已授权索引行里做转义子串匹配。没有写 ADR。`rebuild_evidence_index` 不改已经写下的旧版本 id。`search_evidence` 六个位置参数不变，历史查询用关键字参数 `artifact_version_id`。烟测已于同日实际发出：模型 `deepseek-chat`，成功，用量在本地预算内。T07 写到 review，不标 done。交接见 `workpool/handoffs/T08_T07_CLOSEOUT_2026-11-01.md`。
