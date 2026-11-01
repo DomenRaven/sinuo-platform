@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy import JSON, CheckConstraint, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-SCHEMA_REVISION = "0008_ticket_expiry"
+SCHEMA_REVISION = "0010_evidence_index"
 
 
 class Base(DeclarativeBase):
@@ -59,6 +59,7 @@ import sinuo.infrastructure.domain_models as _domain_models  # noqa: E402
 
 # domain_models rejects tables outside its downgrade list. That check runs
 # while this module is still loading when domain_models is imported first.
-# Register after the check so readiness sees the two tables on the normal path.
+# Register after the check so readiness sees the later tables on the normal path.
 if hasattr(_domain_models, "DOWNGRADE_ORDER"):
+    import sinuo.infrastructure.methods  # noqa: E402, F401
     import sinuo.infrastructure.suggestions  # noqa: E402, F401

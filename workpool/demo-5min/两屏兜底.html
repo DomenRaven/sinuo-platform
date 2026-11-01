@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>静态兜底 · 夜间取物辅助产品</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #1c1915;
+    --paper: #f4efe6;
+    --card: #fffdf8;
+    --line: #d9cfc0;
+    --banner: #7d2b2b;
+    --accent: #1c1915;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    line-height: 1.5;
+    font-size: 1.2rem;
+  }
+  .banner {
+    margin: 0;
+    padding: 0.85rem 1.25rem;
+    background: var(--banner);
+    color: #fff;
+    text-align: center;
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.85rem 1.25rem;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+  }
+  button {
+    font: inherit;
+    font-size: 1.05rem;
+    padding: 0.7rem 1rem;
+    border: 2px solid var(--accent);
+    background: #fff;
+    color: var(--accent);
+    cursor: pointer;
+  }
+  button[aria-pressed="true"] {
+    background: var(--accent);
+    color: #fff;
+  }
+  #where {
+    margin: 0;
+    font-weight: 700;
+  }
+  main {
+    max-width: 58rem;
+    margin: 0 auto;
+    padding: 1.25rem 1.25rem 3rem;
+  }
+  h1 {
+    font-size: 2rem;
+    line-height: 1.25;
+    margin: 0 0 0.4rem;
+  }
+  h2 {
+    font-size: 1.45rem;
+    margin: 1.4rem 0 0.5rem;
+  }
+  .lead, .note, .field {
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 0.85rem 1rem;
+    margin: 0.6rem 0;
+  }
+  .note { background: #fff6e8; }
+  ol { margin: 0.4rem 0 0; padding-left: 1.4rem; }
+  li { margin: 0.35rem 0; }
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: #f7f7f7;
+    border: 1px solid var(--line);
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+  }
+  .k { color: #5c5346; }
+</style>
+</head>
+<body>
+<p class="banner">现场服务打不开时的静态兜底，不是产品页</p>
+<nav>
+  <button type="button" id="b1" aria-pressed="true">第一屏 · 课题与证据</button>
+  <button type="button" id="b2" aria-pressed="false">第二屏 · 四步与待确认</button>
+  <p id="where">当前：第一屏 / 共两屏</p>
+</nav>
+<main>
+  <section id="s1">
+    <h1>夜间取物辅助产品</h1>
+    <p class="lead">虚构课题。种库标记：synthetic=true。虚构数据，不是真实用户研究。项目编号 synthetic-night-pickup。</p>
+    <h2>课题</h2>
+    <p class="field"><span class="k">项目标题</span><br>夜间取物辅助产品</p>
+    <p class="field"><span class="k">项目简述</span><br>synthetic=true。虚构课题，不是真实用户研究。没有真实模型。</p>
+    <p class="note">只读页的大标题是「已跑完的假模型链」。课题名在种库结果和项目行里，只读页不单列这一行。</p>
+    <h2>证据</h2>
+    <p class="field"><span class="k">页标题</span><br>夜间取物需求</p>
+    <p class="field"><span class="k">页正文</span><br>synthetic=true。虚构观察，不是真实用户研究。希望夜间取物时少挪开其他物品。</p>
+    <p class="field"><span class="k">摘录</span><br>夜间取物时要少挪开其他物品</p>
+    <p class="field"><span class="k">作品版本</span><br>synthetic-night-art-v1</p>
+    <p class="field"><span class="k">检索词 / 意图</span><br>夜间取物<br>确认夜间取物是否要少挪开其他物品</p>
+    <p class="note">本屏没有模型输出。模型在第二屏，用的是 FakeModelProvider，不是真实模型。</p>
+  </section>
+  <section id="s2" hidden>
+    <h1>假模型链四步</h1>
+    <p class="lead">页快照和检索来自已测后端。这次运行用的是 FakeModelProvider，不是真实模型。替身不打开网络，也不接触 DeepSeek。</p>
+    <h2>四步</h2>
+    <ol>
+      <li>澄清 · succeeded · 父运行 fake-run-667d73381077ba88</li>
+      <li>查证据 · succeeded · 同一父运行。摘录仍是「夜间取物时要少挪开其他物品」。</li>
+      <li>问方法 · succeeded · 同一父运行。问句：「没有方法卡可查。上面的证据是否够用？」方法卡为空。</li>
+      <li>批评 · succeeded · 另一条运行 fake-critic-run-dca5981538b6b113。动作 draft_decision。</li>
+    </ol>
+    <p class="note">一次运行最多三个职责，所以批评在第二条运行。两条运行的执行状态都是 completed。只读页写「父运行 completed。批评运行 completed。」，步骤行写 succeeded。只读页不印批评运行编号；编号在接口的 critic_run_id。</p>
+    <h2>pending 候选</h2>
+    <p class="field"><span class="k">候选</span><br>fake-candidate-d72e1570b7aa640e<br>status = pending<br>action = draft_decision</p>
+    <p class="note">提案摘要是「待确认」。行状态是 pending。这里没有确认按钮。不要把本屏看成后端已经接受确认，也不要看成已经建页。</p>
+    <p>只读页 pre 里的提案原文：</p>
+    <pre>{"artifact_version_ids":["synthetic-night-art-v1"],"clarification":"确认夜间取物是否要少挪开其他物品","excerpts":["夜间取物时要少挪开其他物品"],"method_card":null,"method_question":"没有方法卡可查。上面的证据是否够用？","page_title":"夜间取物需求","page_version_id":"synthetic-night-page-v1","summary":"待确认"}</pre>
+    <p class="note">现场若能打开只读页，点「确认」也只把浏览器文字改成「本页已标为确认。没有提交到后端。」候选仍是 pending。本文件连这行本地文字也不改。</p>
+  </section>
+</main>
+<script>
+  var current = 1;
+  function show(n) {
+    current = n;
+    document.getElementById("s1").hidden = n !== 1;
+    document.getElementById("s2").hidden = n !== 2;
+    document.getElementById("b1").setAttribute("aria-pressed", n === 1 ? "true" : "false");
+    document.getElementById("b2").setAttribute("aria-pressed", n === 2 ? "true" : "false");
+    document.getElementById("where").textContent = n === 1 ? "当前：第一屏 / 共两屏" : "当前：第二屏 / 共两屏";
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("b1").addEventListener("click", function () { show(1); });
+  document.getElementById("b2").addEventListener("click", function () { show(2); });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowRight" || event.key === "PageDown") show(2);
+    if (event.key === "ArrowLeft" || event.key === "PageUp") show(1);
+  });
+  show(1);
+</script>
+</body>
+</html>

@@ -156,7 +156,7 @@ def test_head_includes_stored_object_tables(assets):
             row[1]
             for row in connection.execute(text("PRAGMA table_info(upload_tickets)"))
         }
-    assert version == "0008_ticket_expiry"
+    assert version == "0010_evidence_index"
     assert {"upload_tickets", "stored_objects", "object_pins"} <= names
     assert ticket_columns == set(UploadTicketRow.__table__.columns.keys())
     assert "object_id" in draft.MISSING_ARTIFACT_VERSION_COLUMNS

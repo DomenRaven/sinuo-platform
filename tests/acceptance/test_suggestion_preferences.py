@@ -162,7 +162,7 @@ def _preference_writes(statements: list[tuple[str, object]]) -> list[tuple[str, 
 
 @pytest.mark.integration
 def test_revision_registers_suggestion_tables(engine):
-    assert SCHEMA_REVISION == "0008_ticket_expiry"
+    assert SCHEMA_REVISION == "0010_evidence_index"
     assert {"suggestion_preferences", "suggestion_triggers"} <= set(Base.metadata.tables)
     with engine.connect() as connection:
         version = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
@@ -171,7 +171,7 @@ def test_revision_registers_suggestion_tables(engine):
                 text("SELECT name FROM sqlite_master WHERE type = 'table'")
             ).scalars()
         )
-    assert version == "0008_ticket_expiry"
+    assert version == "0010_evidence_index"
     assert {"suggestion_preferences", "suggestion_triggers"} <= names
 
 

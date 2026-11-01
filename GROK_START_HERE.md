@@ -1,5 +1,7 @@
 # 使用 Grok 开始思诺后端施工
 
+2026-11-01 晚的接续入口是 `workpool/handoffs/CONTROLLER_HANDOFF_2026-11-01_CLOSE.md`。下面的开工段写于 T02 完成之前，不要用它重做已 done 的 T01–T04。
+
 在能够配置Grok、读取本地工作区、执行终端并提供真实子代理工具的编码宿主中，打开：
 
 `D:\AAA学习\大三上\设计大数据基础\大作业\sinuo-platform`

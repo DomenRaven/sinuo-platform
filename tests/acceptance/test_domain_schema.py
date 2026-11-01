@@ -1,6 +1,7 @@
 """Acceptance checks for the domain head.
 
-Database assertions stay on revision 0008_ticket_expiry and 43 product tables.
+Database assertions stay on revision 0010_evidence_index and 50 application tables.
+Five of those 50 are FTS5 shadow tables of evidence_excerpt_index.
 The 0003 draft remains the domain revision that 0004 follows.
 """
 
@@ -93,8 +94,8 @@ def require_domain_head(engine) -> None:
         foreign_keys = connection.execute(text("PRAGMA foreign_keys")).scalar_one()
         foreign_key_check = connection.execute(text("PRAGMA foreign_key_check")).all()
         integrity = connection.execute(text("PRAGMA integrity_check")).scalar_one()
-    assert version == "0008_ticket_expiry"
-    assert len(names) == 43
+    assert version == "0010_evidence_index"
+    assert len(names) == 50
     assert foreign_keys == 1
     assert foreign_key_check == []
     assert integrity == "ok"
@@ -876,7 +877,7 @@ def test_empty_database_upgrades_to_domain_head(bare_engine):
         names = application_tables(connection)
     assert "login_throttles" in names
     assert {"idempotency_records", "outbox_events", "outbox_deliveries"} <= names
-    assert len(names) == 43
+    assert len(names) == 50
 
 
 @pytest.mark.integration
@@ -922,7 +923,7 @@ def test_upgrade_preserves_foundation_rows_and_lease(bare_engine):
     with bare_engine.begin() as connection:
         command.upgrade(conftest.alembic_config(connection), "head")
         version = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-    assert version == "0008_ticket_expiry"
+    assert version == "0010_evidence_index"
     assert foundation_rows(bare_engine) == before_rows
     assert foundation_ddl(bare_engine) == before_sql
     with write_uow(bare_engine) as session:
@@ -1349,7 +1350,7 @@ def test_downgrade_drops_domain_tables_and_keeps_foundation_rows(bare_engine):
         command.upgrade(conftest.alembic_config(connection), "head")
         assert (
             connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-            == "0008_ticket_expiry"
+            == "0010_evidence_index"
         )
         seed(connection)
         command.downgrade(conftest.alembic_config(connection), "0002_lease_invariants")
@@ -1369,9 +1370,9 @@ def test_downgrade_drops_domain_tables_and_keeps_foundation_rows(bare_engine):
         command.upgrade(conftest.alembic_config(connection), "head")
         assert (
             connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-            == "0008_ticket_expiry"
+            == "0010_evidence_index"
         )
-        assert len(application_tables(connection)) == 43
+        assert len(application_tables(connection)) == 50
 
 
 @pytest.mark.integration
@@ -1383,7 +1384,7 @@ def test_readyz_reports_domain_revision(engine, database_url):
     assert response.json() == {
         "status": "ready",
         "scope": "foundation",
-        "schema_revision": "0008_ticket_expiry",
+        "schema_revision": "0010_evidence_index",
     }
 
 
@@ -1451,7 +1452,7 @@ def test_database_stamped_0003_receives_repair(bare_engine):
         command.upgrade(conftest.alembic_config(connection), "head")
         after = _trigger_names(connection)
         version = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-    assert version == "0008_ticket_expiry"
+    assert version == "0010_evidence_index"
     assert "accounts_login_name_before_insert" in after
     assert "jobs_before_update" in after
     assert "run_tasks_before_update" in after

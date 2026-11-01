@@ -1,9 +1,9 @@
 # T08 持久智能体编排与 DeepSeek 适配
 
-- 状态：implementing。2026-11-01 假模型链可以走出四职责并留下 pending 候选。同一条链可以按 `run.read` 打开只读页面。确认和拒绝只改页面本地状态。不标 done。不跑 live_model，不建方法卡表。
+- 状态：implementing。2026-11-01 假模型链仍返回「没有方法卡可查」。另有 `open_policy_run` 和持久运行。受控 HTTP 有测试。烟测已发出一次：模型 `deepseek-chat`，成功，用量在本地预算内。T06 未签收。不标 done。
 - 依赖：T06、T07 done；可提前基于冻结接口编写 fake 测试，但不能提前完成集成验收
 - Owner：Grok 主控
-- 基线提交或快照：无 Git commit。2026-11-01 迁移 head `0008_ticket_expiry`
+- 基线提交或快照：无新的 Git commit。当前 `main` 的文件树含 `22bcb39`。迁移 head `0010_evidence_index`
 - 写入范围：`agents/` 专责实现、Provider 适配、运行应用服务/仓储和 `tests/acceptance/test_agent_runs.py`；共享事件/工具 schema、迁移由集成 owner 管理
 - 对应门禁：G3；消费者：T09
 
@@ -63,3 +63,11 @@
 ```
 
 退出码 0。5 passed，1 warning，0.90s。警告是 httpx 弃用。随后全量 `.venv/Scripts/python.exe -m pytest -q`，同一缓存目录，退出码 0。308 passed，2 warnings，17.91s。T08 不标 done。
+
+## 持久运行与受控 HTTP 证据（2026-11-01）
+
+状态仍是 implementing。`run_fake_chain`、`read_fake_chain` 和两条 fake-chain 路由没改。假模型链的方法问句仍是「没有方法卡可查。上面的证据是否够用？」，候选里的 `method_card` 仍是空。持久运行在 `src/sinuo/application/agents/execute.py`。计划在调用模型前拒绝第四职责和环。方法职责在写事务外的读事务里调用 `lookup_method`。模型调用和 DeepSeek HTTP 在 `write_uow` 外。一个 `AgentRun` 最多三种职责。预算沿用 `reserve_model_call` / `settle_model_call`。没有新做 `jobs.retry_wait`，没有重开错误分类。`DeepSeekAdapter` 只用测试传入的 `httpx.AsyncClient`，不读密钥文件，不自己创建指向 `api.deepseek.com` 的客户端。受控 HTTP 覆盖成功、空内容、401、402、429、500 和 503。真实 DeepSeek 烟测没有做。`live_model` 没跑。T08 不标 done。交接见 `workpool/handoffs/T07_T08_METHODS_RUN_2026-11-01.md`。
+
+## 自动触发与烟测证据（2026-11-01）
+
+状态仍是 implementing，不标 done。`open_policy_run` 绑定 `preference_revision`。`open_agent_run` 仍写 `origin=manual`、`preference_revision` 为空。`save_suggestion_preference` 没有重写。第一轮后关闭策略或缩小范围，第二轮不调工具、不调模型、不发布候选。手动运行不跟随自动开关取消。`DeepSeekAdapter.from_settings` 已有。受控测试仍传入自己的客户端。用户授权后另发一次。模型自行选为 `deepseek-chat`。命令是带这三项环境变量的 `live_model` pytest，退出码 0，`2 passed`，没有 skip。成功，没有错误类别。用量落在本地预算内。密钥没有写入仓库。假模型链问句没改。T06 未签收，T08 不标 done。交接见 `workpool/handoffs/T08_T07_CLOSEOUT_2026-11-01.md`。

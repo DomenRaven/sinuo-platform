@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     sqlite_busy_timeout_ms: int = Field(default=5000, ge=1, le=60000)
     model_enabled: bool = False
     model_name: str = ""
+    model_name_reasoning: str = "deepseek-v4-pro"
     deepseek_api_key: SecretStr | None = None
     max_specialists: int = Field(default=3, ge=1, le=3)
     max_parallel_tasks: int = Field(default=2, ge=1, le=3)

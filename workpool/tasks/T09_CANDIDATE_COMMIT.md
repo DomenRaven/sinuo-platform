@@ -1,6 +1,6 @@
 # T09 候选预览、人工确认与原子提交
 
-- 状态：planned
+- 状态：review。2026-11-01 证据锚点确认重查已测，四文件 pytest 退出码 0，32 passed。不标 done。T08 仍是 implementing。
 - 依赖：T04、T08 done
 - Owner：候选与领域事务开发
 - 基线提交或快照：认领时填写
@@ -31,3 +31,45 @@
 ## 交接与证据
 
 提供完整 preview/commit/reject 示例和竞争时间线、数据库结果、失败包络。T10 与未来 UI 可基于预览做展示，但 HTTP 业务提交响应才是成功依据；SSE candidate.ready 不代表已写业务对象。
+
+## 预览与确认第一段（2026-11-01）
+
+状态仍是 implementing，不标 done。服务在 `src/sinuo/application/candidates/`。公开函数是 `preview_candidate`、`commit_candidate`、`reject_candidate`、`bound_preview_hash`。没有新迁移。没有 HTTP。主控重跑：
+
+```text
+.venv/Scripts/python.exe -m pytest -q tests/acceptance/test_candidate_commit.py -o cache_dir=_施工文件/2026-11-01_t09/99_临时文件/pytest-cache --basetemp=_施工文件/2026-11-01_t09/99_临时文件/pytest
+```
+
+退出码 0。13 passed，1 warning，1.55s。警告是既有的 httpx 弃用。`add_node`、`add_typed_edge`、`attach_artifact_version` 当时仍是 `not_implemented`。交接见 `workpool/handoffs/T09_PREVIEW_COMMIT_SLICE.md`。
+
+## HTTP 与草稿动作（2026-11-01）
+
+状态仍是 implementing，不标 done。三条路由在 `/api/v1/candidates/{candidate_id}/preview|commit|reject`。三个动作经现有 `commit_candidate` 写入草稿，正文经过 `canonical_document`，不新建正式页版本。没有新迁移。主控重跑：
+
+```text
+.venv/Scripts/python.exe -m pytest -q tests/acceptance/test_candidate_commit.py tests/acceptance/test_candidate_http.py -o cache_dir=_施工文件/2026-11-01_t09http/99_临时文件/pytest-cache --basetemp=_施工文件/2026-11-01_t09http/99_临时文件/pytest
+.venv/Scripts/python.exe -m alembic heads
+```
+
+pytest 退出码 0。28 passed，1 warning，3.02s。heads 退出码 0，只有 `0010_evidence_index`。交接见 `workpool/handoffs/T09_HTTP_ACTIONS_SLICE.md`。
+
+## 空白页回滚与回执投影（2026-11-01）
+
+状态仍是 implementing，不标 review，也不标 done。`test_stage_blank_failure_after_page_insert_rolls_back` 用已有 `before_effect`，没有改 `commit.py`。`test_replay_projects_stored_receipt_after_original_read_is_revoked` 在 `artifact.original.read` 撤掉后回放，返回体没有标题和正文。证据锚点墓碑和撤 `evidence.read` 没有现成调用点，没有补测试。空提案 `{}` 仍不写预览。主控全量：
+
+```text
+.venv/Scripts/python.exe -m pytest -q -o cache_dir=_施工文件/2026-11-01_t09close/99_临时文件/pytest-cache --basetemp=_施工文件/2026-11-01_t09close/99_临时文件/pytest
+.venv/Scripts/python.exe -m alembic heads
+```
+
+pytest 退出码 0。364 passed，2 deselected，2 warnings，23.23s。heads 退出码 0，只有 `0010_evidence_index`。交接见 `workpool/handoffs/T09_CLOSEOUT_2026-11-01.md`。
+
+## 证据锚点确认重查（2026-11-01）
+
+状态写到 review，不标 done。`authorize_proposal` 在 `consume_candidate` 之前，对提案已经点名的每个证据锚点重查 `evidence.read`，范围是 `evidence_anchor`。墓碑用已有 `SOURCE_REDACTED`。没有 `evidence.read` 时抛已有 `ActionForbidden`。没有点名锚点的旧候选不进入这次检查。空提案 `{}` 仍不写预览。没有新迁移，没有新错误码。没有改 `commit.py`。
+
+```text
+.venv/Scripts/python.exe -m pytest -q tests/acceptance/test_candidate_commit.py tests/acceptance/test_candidate_http.py tests/acceptance/test_candidate_projection.py tests/acceptance/test_candidate_evidence.py -o cache_dir=_施工文件/2026-11-01_t09evidence/99_临时文件/pytest-cache --basetemp=_施工文件/2026-11-01_t09evidence/99_临时文件/pytest
+```
+
+pytest 退出码 0。32 passed，1 warning，3.56s。警告是既有的 httpx 弃用。测例是 `test_tombstoned_evidence_anchor_rejects_commit_without_new_rows` 和 `test_revoked_evidence_read_rejects_commit_without_new_rows`。T08 仍是 implementing。交接见 `workpool/handoffs/T09_CLOSEOUT_2026-11-01.md`。

@@ -58,7 +58,7 @@
 ## 7 自主权边界
 
 - 可自主决定：函数结构、算法、局部重构、查询优化、索引、测试夹具、调试路径。
-- 须先写 ADR：改变公共合同（API、事件、错误码、schema、状态枚举）、替换技术栈、引入新基础设施、做不兼容依赖升级。ADR 放 `workpool/decisions/`，按 `workpool/ADR模板.md` 写；目录不存在时由写第一份 ADR 的代理创建。ADR-001 已用于职责限制、ADR-002 已用于基础加固，新 ADR 从 ADR-004 起（ADR-003 已记录文档同步与验收归属）。
+- 须先写 ADR：改变公共合同（API、事件、错误码、schema、状态枚举）、替换技术栈、引入新基础设施、做不兼容依赖升级。ADR 放 `workpool/decisions/`，按 `workpool/ADR模板.md` 写；目录不存在时由写第一份 ADR 的代理创建。ADR-001 至 ADR-006 已使用。新 ADR 从 ADR-007 起。
 - 改变锁定产品定义（白皮书 2.1）不在代理权限内，须用户决定。
 
 ## 8 密钥与外发
@@ -87,7 +87,7 @@ pytest 的缓存与临时目录参数按 `README.md` 指向第 4 节的施工临
 
 ## 11 接续施工说明（2026-10-30）
 
-ADR-002 已用于基础加固，ADR-003 已用于验收归属与文档同步，ADR-004 已用于审查意见分层。后续 ADR 从 ADR-005 起。UoW 内只能用托管 Session 的数据操作，禁止原始 COMMIT/ROLLBACK/BEGIN SQL、原生 DBAPI 或另开连接分拆同一命令；当前提前提交保护面向标准 Session/Connection 接口，不是任意 Python 执行沙箱。T05 必须落实原件 generation/pin/GC 协议；T06→T08 必须落实建议频率与受限后台主体。以最新交接记录识别已做/待做边界。
+ADR-002 已用于基础加固，ADR-003 已用于验收归属与文档同步，ADR-004 已用于审查意见分层，ADR-005 已用于偏好修订冲突码，ADR-006 已用于方法卡表。后续 ADR 从 ADR-007 起。UoW 内只能用托管 Session 的数据操作，禁止原始 COMMIT/ROLLBACK/BEGIN SQL、原生 DBAPI 或另开连接分拆同一命令；当前提前提交保护面向标准 Session/Connection 接口，不是任意 Python 执行沙箱。T05 必须落实原件 generation/pin/GC 协议；T06→T08 必须落实建议频率与受限后台主体。以最新交接记录识别已做/待做边界。
 
 
 ## 12 当前职责与开工入口
