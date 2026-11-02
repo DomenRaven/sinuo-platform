@@ -1,0 +1,24 @@
+<Slide style={{ padding: '60px 60px', background: '#FFFFFF' }}>
+  <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E293B' }}>界面演示：三屏工作台</Text>
+  <Box style={{ width: '100%', height: 1, background: '#E5E7EB', marginTop: 16, marginBottom: 26 }} />
+  <Box style={{ flexDirection: 'row', gap: 32 }}>
+    <Box style={{ flex: 6, flexDirection: 'column', background: '#F8FAFC', borderRadius: 12, padding: '14px', alignItems: 'center', justifyContent: 'center' }}>
+      <Image src="assets/workbench.png" style={{ width: '100%', height: 440, objectFit: 'contain' }} />
+      <Text style={{ fontSize: 15, color: '#64748B', marginTop: 8 }}>OXO 项目「五条握持要求」页：左「你的工作」· 右「智能体工作」</Text>
+    </Box>
+    <Box style={{ flex: 4, flexDirection: 'column', gap: 16 }}>
+      <Box style={{ flexDirection: 'column', background: '#EFF6FF', borderRadius: 10, padding: '18px 20px' }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E3A8A' }}>项目书架</Text>
+        <Text style={{ fontSize: 17, color: '#475569', marginTop: 6, lineHeight: 1.5 }}>登录、项目列表、新建项目（自动写入八阶段）。</Text>
+      </Box>
+      <Box style={{ flexDirection: 'column', background: '#EFF6FF', borderRadius: 10, padding: '18px 20px' }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E3A8A' }}>项目地图</Text>
+        <Text style={{ fontSize: 17, color: '#475569', marginTop: 6, lineHeight: 1.5 }}>8 章泳道 + 页缩略图 + 跨章承接连线 + 页拖拽重排。</Text>
+      </Box>
+      <Box style={{ flexDirection: 'column', background: '#1E3A8A', borderRadius: 10, padding: '18px 20px' }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#FFFFFF' }}>单页工作台</Text>
+        <Text style={{ fontSize: 17, color: '#BFDBFE', marginTop: 6, lineHeight: 1.5 }}>写节点、页内推理图、关系边、中间交付物、对话、候选确认。</Text>
+      </Box>
+    </Box>
+  </Box>
+</Slide>

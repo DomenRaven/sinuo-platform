@@ -1,0 +1,38 @@
+<Slide style={{ padding: '60px 60px', background: '#FFFFFF' }}>
+  <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E293B' }}>核心概念：书 → 章 → 页 → 节点 → 边</Text>
+  <Box style={{ width: '100%', height: 1, background: '#E5E7EB', marginTop: 16, marginBottom: 26 }} />
+  <Box style={{ flexDirection: 'row', gap: 40 }}>
+    <Box style={{ flex: 1, flexDirection: 'column', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
+      <Box style={{ width: 200, background: '#1E3A8A', borderRadius: 8, padding: '12px 0', alignItems: 'center' }}>
+        <Text style={{ fontSize: 18, color: '#FFFFFF', fontWeight: 'bold' }}>书 · 一个项目</Text>
+      </Box>
+      <Box style={{ width: 320, background: '#2563EB', borderRadius: 8, padding: '12px 0', alignItems: 'center' }}>
+        <Text style={{ fontSize: 18, color: '#FFFFFF', fontWeight: 'bold' }}>章 · 8 个阶段（固定模板）</Text>
+      </Box>
+      <Box style={{ width: 440, background: '#3B82F6', borderRadius: 8, padding: '12px 0', alignItems: 'center' }}>
+        <Text style={{ fontSize: 18, color: '#FFFFFF', fontWeight: 'bold' }}>页 · 议题（同阶段可平行）</Text>
+      </Box>
+      <Box style={{ width: 560, background: '#60A5FA', borderRadius: 8, padding: '12px 0', alignItems: 'center' }}>
+        <Text style={{ fontSize: 18, color: '#FFFFFF', fontWeight: 'bold' }}>节点 · 7 类（问题/证据/洞察/要求/作品/测试/决定）</Text>
+      </Box>
+      <Box style={{ width: 660, background: '#93C5FD', borderRadius: 8, padding: '12px 0', alignItems: 'center' }}>
+        <Text style={{ fontSize: 18, color: '#1E3A8A', fontWeight: 'bold' }}>边 · 4 类关系（承接/支持/反例/引用）</Text>
+      </Box>
+      <Text style={{ fontSize: 16, color: '#64748B', marginTop: 8 }}>每次「固化」产生一个版本快照，过程可回溯</Text>
+    </Box>
+    <Box style={{ width: 430, flexDirection: 'column', gap: 18 }}>
+      <Box style={{ flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, padding: '20px 22px' }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E3A8A' }}>七类节点 · 节点可带正文</Text>
+        <Text style={{ fontSize: 17, color: '#475569', marginTop: 8, lineHeight: 1.5 }}>作品、测试、决定三类由人确认，其余由智能体产出或人记录。</Text>
+      </Box>
+      <Box style={{ flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, padding: '20px 22px' }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E3A8A' }}>四类关系边 · 可拖拽连线</Text>
+        <Text style={{ fontSize: 17, color: '#475569', marginTop: 8, lineHeight: 1.5 }}>在页内推理图里，按住节点把手拖到另一节点，即标注「承接 / 支持 / 反例 / 引用」。</Text>
+      </Box>
+      <Box style={{ flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, padding: '20px 22px' }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E3A8A' }}>八阶段固定模板</Text>
+        <Text style={{ fontSize: 17, color: '#475569', marginTop: 8, lineHeight: 1.5 }}>任务与情境 → 用户与场景研究 → 问题及机会定义 → 设计要求 → 概念探索 → 深化与原型 → 测试与迭代 → 表达与复盘。</Text>
+      </Box>
+    </Box>
+  </Box>
+</Slide>

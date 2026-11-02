@@ -1,0 +1,46 @@
+<Slide style={{ padding: '60px 60px', background: '#FFFFFF' }}>
+  <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E293B' }}>实现方法：技术栈与 Vibe Coding 开发</Text>
+  <Box style={{ width: '100%', height: 1, background: '#E5E7EB', marginTop: 16, marginBottom: 28 }} />
+  <Box style={{ flexDirection: 'row', gap: 36 }}>
+    <Box style={{ flex: 1, flexDirection: 'column', gap: 12 }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#EFF6FF', borderRadius: 10, padding: '16px 20px' }}>
+        <Box style={{ width: 90, alignItems: 'center' }}>
+          <Text style={{ fontSize: 16, color: '#2563EB', fontWeight: 'bold' }}>前端层</Text>
+        </Box>
+        <Text style={{ fontSize: 17, color: '#1E293B' }}>单文件 SPA desk.html（约 2500 行）· 苹果式视觉 · 三屏界面</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#EFF6FF', borderRadius: 10, padding: '16px 20px' }}>
+        <Box style={{ width: 90, alignItems: 'center' }}>
+          <Text style={{ fontSize: 16, color: '#2563EB', fontWeight: 'bold' }}>智能体层</Text>
+        </Box>
+        <Text style={{ fontSize: 17, color: '#1E293B' }}>四职责 + 意图分流 · 自研 asyncio 有界 DAG runner（至多 3 职责）</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#EFF6FF', borderRadius: 10, padding: '16px 20px' }}>
+        <Box style={{ width: 90, alignItems: 'center' }}>
+          <Text style={{ fontSize: 16, color: '#2563EB', fontWeight: 'bold' }}>服务层</Text>
+        </Box>
+        <Text style={{ fontSize: 17, color: '#1E293B' }}>Python 3.14 · FastAPI · 版本/草稿/候选/幂等 · 认证与授权</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#EFF6FF', borderRadius: 10, padding: '16px 20px' }}>
+        <Box style={{ width: 90, alignItems: 'center' }}>
+          <Text style={{ fontSize: 16, color: '#2563EB', fontWeight: 'bold' }}>数据层</Text>
+        </Box>
+        <Text style={{ fontSize: 17, color: '#1E293B' }}>SQLite + SQLAlchemy + Alembic（51 表）· trigram 全文 + n-gram 检索 · DeepSeek</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#EFF6FF', borderRadius: 10, padding: '16px 20px' }}>
+        <Box style={{ width: 90, alignItems: 'center' }}>
+          <Text style={{ fontSize: 16, color: '#2563EB', fontWeight: 'bold' }}>质量层</Text>
+        </Box>
+        <Text style={{ fontSize: 17, color: '#1E293B' }}>pytest · 58 个测试文件 · 455 通过 / 2 排除</Text>
+      </Box>
+    </Box>
+    <Box style={{ width: 400, flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, padding: '24px 24px' }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E3A8A' }}>Vibe Coding 迭代循环</Text>
+      <Box style={{ flexDirection: 'column', marginTop: 16, gap: 10 }}>
+        <Text style={{ fontSize: 17, color: '#475569', lineHeight: 1.5 }}>① 需求描述 → ② AI 生成 → ③ 浏览器实测 → ④ 定位 bug → ⑤ 修改 → ⑥ 测试回归</Text>
+      </Box>
+      <Box style={{ height: 1, background: '#E5E7EB', marginTop: 18, marginBottom: 18 }} />
+      <Text style={{ fontSize: 17, color: '#475569', lineHeight: 1.6 }}>Grok 搭后端骨架 · Cursor 做功能开发 · WorkBuddy 做 UI 升级、智能体接线与全流程实测</Text>
+    </Box>
+  </Box>
+</Slide>

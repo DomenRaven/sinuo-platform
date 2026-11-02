@@ -1,0 +1,25 @@
+<Slide style={{ padding: '60px 60px', background: '#FFFFFF' }}>
+  <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E293B' }}>真实案例：OXO Good Grips 削皮器全流程复刻</Text>
+  <Box style={{ width: '100%', height: 1, background: '#E5E7EB', marginTop: 16, marginBottom: 26 }} />
+  <Box style={{ flexDirection: 'row', gap: 32 }}>
+    <Box style={{ flex: 6, flexDirection: 'column', background: '#F8FAFC', borderRadius: 12, padding: '14px', alignItems: 'center', justifyContent: 'center' }}>
+      <Image src="assets/project_map_top.png" style={{ width: '100%', height: 440, objectFit: 'contain' }} />
+      <Text style={{ fontSize: 15, color: '#64748B', marginTop: 8 }}>项目地图：章泳道 + 页缩略图 + 承接连线</Text>
+    </Box>
+    <Box style={{ flex: 4, flexDirection: 'column', gap: 16 }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 10 }}>
+        <Text style={{ fontSize: 56, fontWeight: 'bold', color: '#2563EB' }}>8 章 14 页</Text>
+        <Text style={{ fontSize: 18, color: '#64748B', paddingBottom: 8 }}>完整演示项目</Text>
+      </Box>
+      <Box style={{ flexDirection: 'column', background: '#EFF6FF', borderRadius: 10, padding: '16px 20px' }}>
+        <Text style={{ fontSize: 18, color: '#1E293B', lineHeight: 1.55 }}>过程检查两次判定「当前阶段目标已记录清楚」，<span style={{ fontWeight: 'bold', color: '#2563EB' }}>建议并确认建出具体标题的新页</span>；证据不足时，也能先提出下一步、由人拍板。</Text>
+      </Box>
+      <Box style={{ flexDirection: 'column', background: '#EFF6FF', borderRadius: 10, padding: '16px 20px' }}>
+        <Text style={{ fontSize: 18, color: '#1E293B', lineHeight: 1.55 }}>证据检索命中「细硬金属柄…」，方法检索命中「用户访谈 + 可用性测试」。</Text>
+      </Box>
+      <Box style={{ flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, padding: '16px 20px' }}>
+        <Text style={{ fontSize: 16, color: '#64748B', lineHeight: 1.5 }}>公开依据：Cooper Hewitt 馆藏 · US4974286 专利 · Smart Design 记述，不编造数据。</Text>
+      </Box>
+    </Box>
+  </Box>
+</Slide>

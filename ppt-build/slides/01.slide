@@ -1,0 +1,16 @@
+<Slide style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 55%, #3B82F6 100%)', padding: '70px 80px' }}>
+  <Box style={{ flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+    <Text style={{ fontSize: 16, color: '#BFDBFE', letterSpacing: 2 }}>《设计大数据基础》课程项目</Text>
+    <Box style={{ flexDirection: 'column' }}>
+      <Text style={{ fontSize: 80, fontWeight: 'bold', color: '#FFFFFF', letterSpacing: 2 }}>思诺 Seno</Text>
+      <Text style={{ fontSize: 32, color: '#E0E7FF', marginTop: 14, fontWeight: 'bold' }}>AI 辅助设计过程管理平台</Text>
+      <Box style={{ width: 64, height: 4, background: '#F59E0B', borderRadius: 2, marginTop: 30 }} />
+      <Text style={{ fontSize: 21, color: '#BFDBFE', marginTop: 22, lineHeight: 1.6 }}>面向工业设计课程 · 学生写，AI 查证把关，人确认</Text>
+    </Box>
+    <Box style={{ flexDirection: 'row', gap: 28 }}>
+      <Text style={{ fontSize: 16, color: '#BFDBFE' }}>学号 3240103625</Text>
+      <Text style={{ fontSize: 16, color: '#BFDBFE' }}>姓名 张玮勐</Text>
+      <Text style={{ fontSize: 16, color: '#BFDBFE' }}>2026 年 11 月</Text>
+    </Box>
+  </Box>
+</Slide>

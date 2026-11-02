@@ -1,0 +1,39 @@
+<Slide style={{ padding: '60px 60px', background: '#FFFFFF' }}>
+  <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E293B' }}>核心交互：写节点 → 连线 → 问智能体 → 确认</Text>
+  <Box style={{ width: '100%', height: 1, background: '#E5E7EB', marginTop: 16, marginBottom: 26 }} />
+  <Box style={{ flexDirection: 'row', gap: 32 }}>
+    <Box style={{ flex: 4, flexDirection: 'column', gap: 14 }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <Box style={{ width: 34, height: 34, borderRadius: 17, background: '#2563EB', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 17, color: '#FFFFFF', fontWeight: 'bold' }}>1</Text>
+        </Box>
+        <Text style={{ fontSize: 18, color: '#1E293B' }}><span style={{ fontWeight: 'bold' }}>写节点</span>　选 7 类之一 + 填正文</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <Box style={{ width: 34, height: 34, borderRadius: 17, background: '#2563EB', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 17, color: '#FFFFFF', fontWeight: 'bold' }}>2</Text>
+        </Box>
+        <Text style={{ fontSize: 18, color: '#1E293B' }}><span style={{ fontWeight: 'bold' }}>连关系边</span>　拖节点把手，标注承接/支持/反例/引用</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <Box style={{ width: 34, height: 34, borderRadius: 17, background: '#1E3A8A', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 17, color: '#FFFFFF', fontWeight: 'bold' }}>3</Text>
+        </Box>
+        <Text style={{ fontSize: 18, color: '#1E293B' }}><span style={{ fontWeight: 'bold' }}>问智能体</span>　对话输入，意图分流触发运行</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <Box style={{ width: 34, height: 34, borderRadius: 17, background: '#F59E0B', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 17, color: '#FFFFFF', fontWeight: 'bold' }}>4</Text>
+        </Box>
+        <Text style={{ fontSize: 18, color: '#1E293B' }}><span style={{ fontWeight: 'bold' }}>确认候选</span>　预览后确认/拒绝，确认才生效</Text>
+      </Box>
+      <Box style={{ flexDirection: 'column', background: '#EFF6FF', borderRadius: 10, padding: '18px 20px', marginTop: 8 }}>
+        <Text style={{ fontSize: 17, color: '#1E3A8A', lineHeight: 1.55 }}>智能体运行产出「角色卡」（总结/缺口/依据）+ 工具调用链 + 「待确认」候选卡。</Text>
+      </Box>
+    </Box>
+    <Box style={{ flex: 6, flexDirection: 'column', background: '#F8FAFC', borderRadius: 12, padding: '14px', alignItems: 'center', justifyContent: 'center' }}>
+      <Image src="assets/agent_output.png" style={{ width: '100%', height: 440, objectFit: 'contain' }} />
+      <Text style={{ fontSize: 15, color: '#64748B', marginTop: 8 }}>证据查找角色卡 + 工具调用链 + 待确认候选卡</Text>
+    </Box>
+  </Box>
+</Slide>

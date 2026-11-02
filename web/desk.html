@@ -314,6 +314,35 @@
     .ne-actions .ne-del { margin-left: auto; background: transparent; color: var(--danger); }
     .ne-actions .ne-ask { background: transparent; color: var(--action); }
 
+    /* 通用输入弹窗（新建页 / 建锚点） */
+    .prompt-overlay {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(0, 0, 0, 0.28);
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .prompt-panel {
+      width: 100%; max-width: 560px; max-height: 86vh; overflow: auto;
+      background: var(--card); border-radius: 22px; padding: 26px 28px;
+      box-shadow: var(--shadow-lg);
+    }
+    .prompt-panel .pp-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+    .prompt-panel .pp-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .prompt-panel .pp-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .chapter .page-add {
+      margin-top: 10px; width: 100%; padding: 9px; border-radius: 12px;
+      background: transparent; color: var(--action); border: 1px dashed var(--line);
+      font-weight: 600;
+    }
+    .chapter .page-add:hover { background: var(--action-soft); border-color: var(--action); }
+    .dv-anchor {
+      margin-top: 8px; width: 100%; padding: 7px 10px; border-radius: 10px;
+      background: transparent; color: var(--action); border: 1px solid var(--line);
+      font-size: 14px; font-weight: 600;
+    }
+    .dv-anchor:hover { background: var(--action-soft); }
+    .chat-query-row { display: flex; gap: 8px; margin-bottom: 6px; }
+    .chat-query-row input { flex: 1; }
+
     /* 运行工作流 */
     .run-flow { display: flex; flex-direction: column; gap: 12px; }
     .run-intent {
@@ -912,11 +941,19 @@
       title.setAttribute("aria-describedby", "create-help");
       const titleLabel = el("label", "", "课题名称");
       titleLabel.htmlFor = "project-title";
-      const help = el("p", "meta", "建立后，项目会从第一个阶段开始。");
+      const pageTitle = el("input");
+      pageTitle.id = "project-page-title";
+      pageTitle.type = "text";
+      pageTitle.name = "page_title";
+      pageTitle.maxLength = 200;
+      pageTitle.placeholder = "留空则与课题同名";
+      const pageTitleLabel = el("label", "", "首页标题（可选）");
+      pageTitleLabel.htmlFor = "project-page-title";
+      const help = el("p", "meta", "建立后，项目会从第一个阶段开始，并自动铺好八个阶段。");
       help.id = "create-help";
       const submit = el("button", "", "建立项目");
       submit.type = "submit";
-      form.append(titleLabel, title, help, submit);
+      form.append(titleLabel, title, pageTitleLabel, pageTitle, help, submit);
       form.addEventListener("submit", function (event) {
         event.preventDefault();
         const stored = title.value.trim();
@@ -925,6 +962,9 @@
           return;
         }
         if (!form.dataset.key) form.dataset.key = crypto.randomUUID();
+        const payload = { title: stored };
+        const pageStored = pageTitle.value.trim();
+        if (pageStored) payload.page_title = pageStored;
         submit.disabled = true;
         api("/api/v1/projects", {
           method: "POST",
@@ -933,7 +973,7 @@
             "X-CSRF-Token": csrf,
             "Idempotency-Key": form.dataset.key,
           },
-          body: JSON.stringify({ title: stored }),
+          body: JSON.stringify(payload),
         }).then(function (result) {
           submit.disabled = false;
           if (!result.ok) {
@@ -1136,7 +1176,10 @@
             if (page) pagesBox.append(pageThumb(page, reading.project_id));
           });
         }
-        chapter.append(pagesBox);
+        const addBtn = el("button", "page-add", "＋ 新建页");
+        addBtn.type = "button";
+        addBtn.addEventListener("click", function () { createPageInStage(reading, stage); });
+        chapter.append(pagesBox, addBtn);
         canvas.append(chapter);
       });
 
@@ -1147,6 +1190,30 @@
     }
 
     let dragState = null;
+
+    async function createPageInStage(reading, stage) {
+      const title = await promptInput({
+        title: "新建页",
+        meta: "在「" + (stage.name || "未命名阶段") + "」里加一页。",
+        placeholder: "页标题，例如：厨师的连续削切",
+        okLabel: "建立页",
+      });
+      if (!title || !title.trim()) return;
+      const result = await api("/api/v1/projects/" + encodeURIComponent(reading.project_id) + "/pages", {
+        method: "POST",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify({
+          stage_id: stage.stage_id,
+          title: title.trim(),
+          expected_revision: reading.revision,
+        }),
+      });
+      if (!result.ok) {
+        alert("建页失败：" + result.message);
+        return;
+      }
+      location.reload();
+    }
 
     function pageThumb(page, projectId) {
       const thumb = el("div", "page-thumb");
@@ -1665,6 +1732,41 @@
       };
     }
 
+    // 通用输入弹窗：返回用户输入的文本，取消返回 null
+    function promptInput(opts) {
+      return new Promise(function (resolve) {
+        const overlay = el("div", "prompt-overlay");
+        const panel = el("div", "prompt-panel");
+        panel.append(
+          el("div", "pp-title", opts.title || ""),
+          el("div", "pp-meta", opts.meta || ""),
+        );
+        const input = document.createElement(opts.textarea ? "textarea" : "input");
+        input.type = opts.textarea ? undefined : "text";
+        if (opts.placeholder) input.placeholder = opts.placeholder;
+        if (opts.value) input.value = opts.value;
+        if (opts.maxLength) input.maxLength = opts.maxLength;
+        panel.append(input);
+        const actions = el("div", "pp-actions");
+        const cancel = el("button", "quiet", "取消");
+        cancel.type = "button";
+        const ok = el("button", "", opts.okLabel || "确定");
+        ok.type = "button";
+        actions.append(cancel, ok);
+        panel.append(actions);
+        overlay.append(panel);
+        function close(val) { overlay.remove(); resolve(val); }
+        cancel.addEventListener("click", function () { close(null); });
+        ok.addEventListener("click", function () { close(input.value); });
+        overlay.addEventListener("click", function (event) { if (event.target === overlay) close(null); });
+        input.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" && !opts.textarea) { event.preventDefault(); close(input.value); }
+        });
+        document.body.appendChild(overlay);
+        input.focus();
+      });
+    }
+
     // 节点编辑弹层：改内容 / 删除
     function openNodeEditor(reading, node, chip) {
       if (!reading.draft) return;
@@ -1711,13 +1813,14 @@
       textarea.focus();
     }
 
-    // 从节点弹层跳转到对话输入框，并把节点作为上下文预填进去。
+    // 从节点弹层跳转到对话输入框，并把节点作为关键词预填进去。
     function focusChatForNode(node) {
       const input = document.getElementById("chat-input");
       if (!input) return;
-      const label = node.label || NODE_LABEL[node.kind] || "节点";
       const snippet = (node.content || "").replace(/\s+/g, " ").slice(0, 28);
-      input.value = "查证据：" + label + (snippet ? "「" + snippet + "…」" : "");
+      input.value = "查证据";
+      const query = document.getElementById("chat-query");
+      if (query) query.value = snippet;
       input.focus();
       input.scrollIntoView({ behavior: "smooth", block: "center" });
       const box = input.closest(".chat-box");
@@ -1833,9 +1936,41 @@
           el("span", "dv-ver", "第 " + item.version_no + " 版"),
         );
         card.append(link);
+        const anchor = el("button", "dv-anchor", "锚定一段作证据");
+        anchor.type = "button";
+        anchor.addEventListener("click", function () { createAnchor(projectId, item, anchor); });
+        card.append(anchor);
         list.append(card);
       });
       if (result.data.has_hidden_artifacts) list.append(el("p", "", "有不可见内容"));
+    }
+
+    async function createAnchor(projectId, item, button) {
+      const excerpt = await promptInput({
+        title: "锚定证据",
+        meta: "从「" + (item.title || "交付物") + "」里摘一段文字作为证据。",
+        placeholder: "粘贴或键入一段原文，例如：细硬金属柄在湿手和握力不足时打滑、疼痛",
+        textarea: true,
+        maxLength: 4000,
+        okLabel: "锚定",
+      });
+      if (!excerpt || !excerpt.trim()) return;
+      button.disabled = true;
+      const result = await api("/api/v1/projects/" + encodeURIComponent(projectId) + "/evidence-anchors", {
+        method: "POST",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify({
+          artifact_version_id: item.artifact_version_id,
+          excerpt: excerpt.trim(),
+          locator: { page: 1, start: 0, end: excerpt.trim().length },
+        }),
+      });
+      button.disabled = false;
+      if (!result.ok) {
+        alert("锚定失败：" + result.message);
+        return;
+      }
+      alert("已锚定这段证据。");
     }
 
     function uploadForm(reading, list) {
@@ -1978,8 +2113,16 @@
       const send = el("button", "chat-send", "发送");
       send.type = "submit";
       form.append(input, send);
-      const hint = el("p", "chat-hint", "可输入：检查下一步、查证据、问方法、简报变化，回车或点「发送」。");
-      box.append(form, hint);
+      const queryRow = el("div", "chat-query-row");
+      const query = el("input");
+      query.type = "text";
+      query.id = "chat-query";
+      query.placeholder = "关键词（可选，检索证据/理论时用）";
+      query.autocomplete = "off";
+      queryRow.append(query);
+      box.append(form, queryRow);
+      const hint = el("p", "chat-hint", "可输入：检查下一步、查证据、问方法、简报变化，回车或点「发送」。关键词会带入证据/理论检索。");
+      box.append(hint);
       form.addEventListener("submit", async function (event) {
         event.preventDefault();
         const text = input.value.trim();
@@ -1990,10 +2133,11 @@
         }
         send.disabled = true;
         send.textContent = "发送中…";
-        await askNext(send, reading, runSlot, cardSlot, text, text);
+        await askNext(send, reading, runSlot, cardSlot, text, text, query.value.trim());
         send.disabled = false;
         send.textContent = "发送";
         input.value = "";
+        query.value = "";
       });
       return box;
     }
@@ -2183,22 +2327,24 @@
       return box;
     }
 
-    async function askNext(button, reading, runSlot, cardSlot, intent, label) {
+    async function askNext(button, reading, runSlot, cardSlot, intent, label, query) {
       const before = reading.draft ? reading.draft.content_revision : null;
       button.disabled = true;
       const original = button.querySelector(".q-name");
       if (original) original.textContent = label + "…";
+      const body = {
+        intent: intent,
+        input_mode: "confirmed",
+        page_version_id: reading.head_version_id,
+        page_version_ids: readSet.pageVersionIds,
+        artifact_version_ids: readSet.artifactVersionIds,
+        exclusions: readSet.exclusions,
+      };
+      if (query) body.query = query;
       const started = await api("/api/v1/projects/" + encodeURIComponent(reading.project_id) + "/agent-runs", {
         method: "POST",
         headers: writeHeaders(crypto.randomUUID()),
-        body: JSON.stringify({
-          intent: intent,
-          input_mode: "confirmed",
-          page_version_id: reading.head_version_id,
-          page_version_ids: readSet.pageVersionIds,
-          artifact_version_ids: readSet.artifactVersionIds,
-          exclusions: readSet.exclusions,
-        }),
+        body: JSON.stringify(body),
       });
       button.disabled = false;
       if (original) original.textContent = label;

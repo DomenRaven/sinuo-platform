@@ -1,0 +1,33 @@
+<Slide style={{ padding: '60px 60px', background: '#FFFFFF' }}>
+  <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E293B' }}>验证：自动化测试 + 真实案例复刻</Text>
+  <Box style={{ width: '100%', height: 1, background: '#E5E7EB', marginTop: 16, marginBottom: 30 }} />
+  <Box style={{ flexDirection: 'row', gap: 44, alignItems: 'center' }}>
+    <Box style={{ width: 360, flexDirection: 'column', background: '#1E3A8A', borderRadius: 14, padding: '40px 36px', alignItems: 'center' }}>
+      <Text style={{ fontSize: 96, fontWeight: 'bold', color: '#FFFFFF', lineHeight: 1 }}>455</Text>
+      <Text style={{ fontSize: 20, color: '#BFDBFE', marginTop: 12 }}>项测试通过</Text>
+      <Box style={{ height: 1, background: 'rgba(255,255,255,0.25)', width: '80%', marginTop: 20, marginBottom: 20 }} />
+      <Text style={{ fontSize: 16, color: '#93C5FD' }}>58 个测试文件 · 2 项真实模型测试排除</Text>
+    </Box>
+    <Box style={{ flex: 1, flexDirection: 'column', gap: 14 }}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <Box style={{ width: 12, height: 12, borderRadius: 6, background: '#2563EB' }} />
+        <Text style={{ fontSize: 18, color: '#1E293B' }}><span style={{ fontWeight: 'bold' }}>领域约束</span>　节点/边类型、版本 CAS、幂等一致性</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <Box style={{ width: 12, height: 12, borderRadius: 6, background: '#2563EB' }} />
+        <Text style={{ fontSize: 18, color: '#1E293B' }}><span style={{ fontWeight: 'bold' }}>HTTP 与并发</span>　认证、越权、双连接竞争、故障回滚</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <Box style={{ width: 12, height: 12, borderRadius: 6, background: '#2563EB' }} />
+        <Text style={{ fontSize: 18, color: '#1E293B' }}><span style={{ fontWeight: 'bold' }}>候选提交</span>　预览确认、带类型关系边全链路</Text>
+      </Box>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <Box style={{ width: 12, height: 12, borderRadius: 6, background: '#F59E0B' }} />
+        <Text style={{ fontSize: 18, color: '#1E293B' }}><span style={{ fontWeight: 'bold' }}>真实案例</span>　OXO 削皮器 8 章 14 页端到端走通</Text>
+      </Box>
+      <Box style={{ flexDirection: 'column', background: '#EFF6FF', borderRadius: 10, padding: '16px 20px', marginTop: 6 }}>
+        <Text style={{ fontSize: 18, color: '#1E3A8A', lineHeight: 1.55 }}>全量 pytest 无回归；真实 DeepSeek 下，登录 → 写节点 → 固化 → 问下一步 → 候选确认 → 建新页，整条链路走通。</Text>
+      </Box>
+    </Box>
+  </Box>
+</Slide>
