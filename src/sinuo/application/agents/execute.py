@@ -99,7 +99,8 @@ _STAGE_GUIDANCE = (
     "并且 evidence 有对应证据片段，就算这一阶段已经明确，应建议进入下一阶段。"
     "建议进入下一阶段时返回 JSON：action=\"suggest_stage_transition\"、"
     "page_mode=\"stage_blank\"、target_stage_id 填 stages 中 position 比 current_stage 所在阶段大 1 的那个 stage_id、"
-    "title 填新页标题、sources 填 [{\"page_version_id\": 输入里的 page_version_id 字段值}]。"
+    "title 填一个具体的新页标题（例如该阶段要探索的第一个问题或第一个方向），不要直接填目标阶段的名称、也不要留空，"
+    "sources 填 [{\"page_version_id\": 输入里的 page_version_id 字段值}]。"
     "证据不足或目标未记录清楚时只返回 summary 和 gaps，不返回 action、page_mode、target_stage_id、title、sources。"
 )
 _EDGE_GUIDANCE = (

@@ -1,20 +1,33 @@
 # 当前代码施工会话游标
 
-更新：2026-11-01 晚。下一窗口是界面总控，先读 `workpool/handoffs/CONTROLLER_HANDOFF_2026-11-01_UI.md`。不要把 T05–T11 改成 done。不要签 G0–G4。
+更新：2026-11-02 中午。不要把 T05–T11 改成 done。不要签 G0–G4。
 
 - 迁移 head：`0010_evidence_index`。`SCHEMA_REVISION` 与之相同。
-- 纵向：`.venv/Scripts/python.exe -m pytest -q tests/acceptance/test_end_to_end.py` 退出码 0，1 passed，1 warning。全量 `.venv/Scripts/python.exe -m pytest -q` 退出码 0，406 passed，2 deselected，1 warning，45.66s。`live_model` 仍被排除。这次警告是 httpx 弃用。
-- `test_end_to_end.py` 已调用上传、证据锚点、测试记录和 `POST /projects/{id}/agent-runs`。启动运行注入 `FakeModelProvider`，`Settings` 用 `_env_file=None` 且 `model_enabled=False`。导出登记后调用 `drain_export_jobs`，再下载 zip。3D 和真实模型仍写未执行。阶段空白页仍未执行：这次运行留下的候选是 `draft_decision`，没有插入阶段空白候选，也没有调用预览或确认。
-- OpenAPI 30 条路径。没有改假模型链和种库脚本。没有提交。
+- 全量：`.venv/Scripts/python.exe -m pytest -q` 退出码 0，454 passed，2 deselected，1 warning，40.71s。`pyproject.toml` 的 addopts 排除 `live_model`，所以这 2 条被 deselected。警告是 Starlette 对 `httpx` TestClient 的弃用提示。
+- 已在 `origin/main` 的提交是 `616dc7e`（可点工作台、节点正文、四类关系边、读集勾选、候选确认）。其下有合并提交 `2b8ecb8`，用来对齐远程上内容相同的基线。这次补录之后，手册第 49 行、`BOARD.md`、`SESSION.md` 还在工作区，尚未再次提交。
+- 关系边：`derives` / `supports` / `refutes` / `cites`，界面称承接、支持、反例、引用。缺省旧边读回承接。人在页内拖拽连线写入草稿；过程检查可提议带 `kind` 的 `add_typed_edge`，确认后才进入正式草稿。
+- 节点：当前开放七类（问题、证据、洞察、要求、作品、测试、决定），可以写正文。素材和概念仍在白皮书第 4.1 节，没有进入 2026-11-01 范围决定和 WAVE_F03。用户手册第 49 行已改成这个口径；第 6 章本来就是七类。
+- 读集：T13a、T13b 和 `desk.html` 勾选已接入。T13c 未做。
 - 用户决定：不做 GLB 和其他 3D。见 `USER_WAIVE_3D.md`。
-- 周一 2026-11-02 18:00 若汇报还不能点到 pending 候选，就停后端，改两屏演示。种库脚本是 `scripts/seed_night_demo.py`。假模型链不要重做。
+- 11 月 1 日晚的「406 passed、OpenAPI 30 条、没有提交」是当时快照，不再代表现在。
 
 ## 状态
 
 - T01–T04：done。
 - T05、T06、T08、T10、T11：implementing。
 - T07、T09：review。不标 done。
+- T12、T13：implementing。S1–S4、节点正文、关系边类型化和读集前端已补录。不标 done。
+
+## 演示路径（2026-11-02 中午）
+
+在已运行的 `http://127.0.0.1:8000` 上新建项目「路径冒烟1102」，没有改「夜间取物」。
+
+- 登录 `synthetic-lead` 后进入项目书架，再建项目，项目地图出现八个阶段。第 1 章有 1 页。
+- 打开该页，写下问题节点「课题边界：演示路径只验证登录、写节点、确认版本和待确认候选。」页内推理图显示「问题 / 课题澄清」。
+- 确认为正式版本后，页面显示「已确认第 2 版」。
+- 点「检查下一步」。运行结束：证据查找已完成（检索证据无结果，读取页快照完成），过程检查已完成。待确认卡是「草稿决定」，写明证据不足，并写「这是一条过程记录，无需确认」。因此没有预览、确认或拒绝按钮。这是证据不足时的现有行为。
+- 没有上传原件，所以这条冒烟没有走到可预览的阶段建议。
 
 ## 下一动作
 
-界面总控按 `CONTROLLER_HANDOFF_2026-11-01_UI.md` 做一条能点的路径。外观按用户 2026-11-01 晚的决定：苹果式，简洁大气，明亮舒服，组件圆润，可以用大卡片，层次和路径要清楚。这压过 UI 白皮书第 7.1 节的色值。行为仍按页面规范。不要先铺满 R01–R14。智能体工作要能看见。不签 G0–G4。
+演示若需要可点的确认或拒绝，用已有证据的项目再问一次「下一步」，不要在空项目上期待阶段建议。不新开页面。不签 G0–G4。
