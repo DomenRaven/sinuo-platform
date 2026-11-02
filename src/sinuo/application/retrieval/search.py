@@ -71,12 +71,15 @@ def search_evidence(
     limit: int,
     *,
     artifact_version_id: str | None = None,
+    artifact_version_ids: tuple[str, ...] | None = None,
 ) -> SearchEvidenceResult:
     """Search one project's authorized indexed excerpts.
 
     The current ``evidence.read`` set is calculated first. Trigram or
     substring matching then runs only inside that set. ``artifact_version_id``
-    limits the result to that exact original version. ``latest``, ``head``,
+    limits the result to that exact original version. ``artifact_version_ids``
+    limits the result to that set of versions; an empty tuple matches nothing,
+    while ``None`` means no version restriction. ``latest``, ``head``,
     ``current`` and ``newest`` are rejected. Omitting the version does not
     retarget an older excerpt onto a newer original.
     """
@@ -84,6 +87,7 @@ def search_evidence(
     checked = _require_query(query)
     bounded = _require_limit(limit)
     version_filter = _optional_version(artifact_version_id)
+    version_filters = _optional_versions(artifact_version_ids)
     if not _project_is_listed(authorizer, principal, project_id):
         return _empty()
     with session.no_autoflush:
@@ -94,7 +98,10 @@ def search_evidence(
                 .order_by(ArtifactVersion.id)
             ).all()
         )
-        if version_filter is not None:
+        if version_filters is not None:
+            allowed = set(version_filters)
+            version_ids = [version_id for version_id in version_ids if version_id in allowed]
+        elif version_filter is not None:
             if version_filter not in version_ids:
                 return _empty()
             version_ids = [version_filter]
@@ -103,7 +110,12 @@ def search_evidence(
             .where(EvidenceAnchor.project_id == project_id)
             .order_by(EvidenceAnchor.id)
         ).all()
-        if version_filter is not None:
+        if version_filters is not None:
+            allowed = set(version_filters)
+            anchor_rows = [
+                row for row in anchor_rows if row.artifact_version_id in allowed
+            ]
+        elif version_filter is not None:
             anchor_rows = [
                 row for row in anchor_rows if row.artifact_version_id == version_filter
             ]
@@ -222,6 +234,20 @@ def _optional_version(value: object) -> str | None:
     if value.casefold() in _ALIASES:
         raise ValueError("artifact_version_id")
     return value
+
+
+def _optional_versions(value: object) -> tuple[str, ...] | None:
+    """Normalize a version set. ``None`` means no restriction; ``()`` means none match."""
+    if value is None:
+        return None
+    if not isinstance(value, (tuple, list, frozenset, set)):
+        raise ValueError("artifact_version_ids")
+    kept: list[str] = []
+    for item in value:
+        checked = _optional_version(item)
+        if checked not in kept:
+            kept.append(checked)
+    return tuple(kept)
 
 
 def _empty() -> SearchEvidenceResult:

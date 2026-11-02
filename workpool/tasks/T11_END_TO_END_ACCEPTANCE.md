@@ -19,6 +19,19 @@
 
 HTTP 已走：登录、建项目、同一阶段第二张平行页、改草稿、检查点、查看历史、创建分支、审阅意见、导出登记和状态读取。隔离恢复调用了 `restore_snapshot`，先有一次 `backup_snapshot`。上传原件、创建作品、证据锚点、测试记录、启动运行、预览确认、导出包生成、3D 和真实模型记为未执行。
 
+## 2026-11-01 纵向调用
+
+不标 done。T05、T06、T08、T10 也不在本段改成 done。G0–G4 仍不签。
+
+`tests/acceptance/test_end_to_end.py` 改为调用已挂上的上传、证据锚点、测试记录和 `POST /projects/{id}/agent-runs`。启动运行注入 `FakeModelProvider`，不读本机 `.env` 去打 DeepSeek。同名新字节登记为第二版，第一版哈希和绑在第一版上的测试记录保持不变。导出登记后调用 `drain_export_jobs`，再 `GET /exports/{id}/content`。阶段空白页仍未执行：这次运行留下的候选是 `draft_decision`，没有插入阶段空白候选。3D 和真实模型仍写未执行。
+
+```text
+.venv/Scripts/python.exe -m pytest -q tests/acceptance/test_end_to_end.py
+.venv/Scripts/python.exe -m pytest -q
+```
+
+第一条退出码 0，1 passed，1 warning。第二条退出码 0，406 passed，2 deselected，1 warning，45.66s。未跑 `live_model`。没有 Git commit。
+
 ## 目标
 
 在集成基线上以真实 API、数据库和文件存储跑通一个完整课题，并用可重复故障证明关键不变量。交付下一位开发者可以启动、查源、复现失败和继续做 UI 的后端，而不是仅有接口列表或一段成功录屏。

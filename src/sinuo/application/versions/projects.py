@@ -1,4 +1,8 @@
-"""Create a project with its first stage and blank page. The caller owns write_uow."""
+"""Create a project with the fixed product-design stages and its home page.
+
+The caller owns write_uow. The eight stage names are fixed in this module.
+There is no catalog for adding or removing templates.
+"""
 
 import uuid
 from collections.abc import Callable
@@ -17,6 +21,17 @@ from sinuo.domain.auth.roles import grants_for_template
 from sinuo.domain.public_contract import Action, RoleTemplate
 from sinuo.domain.schema_types import canonical_json
 from sinuo.infrastructure.domain_models import Project, Stage, StageConfigVersion
+
+PRODUCT_STAGE_NAMES = (
+    "任务与情境",
+    "用户与场景研究",
+    "问题及机会定义",
+    "设计要求",
+    "概念探索",
+    "深化与原型",
+    "测试与迭代",
+    "表达与复盘",
+)
 
 
 @dataclass(frozen=True)
@@ -46,10 +61,12 @@ def create_project(
     page_title: str | None = None,
     before_audit: Callable[[], None] | None = None,
 ) -> CreatedProject:
-    """Insert a project, one stage, one blank page v1, draft, membership, and acl.manage.
+    """Insert a project, the eight fixed stages, and one blank home page.
 
-    The project id is generated here. revision and access_epoch are inserted as 1
-    and access_epoch is not increased. Does not commit.
+    The home page is on the first stage, 任务与情境. Returned stage_id and page_id
+    are that stage and that page. Each stage config keeps the project title in
+    goal and the fixed stage name in name. revision and access_epoch are inserted
+    as 1 and access_epoch is not increased. Does not commit.
 
     before_audit runs after that graph is flushed and before the audit and outbox
     rows. The caller still owns rollback.
@@ -65,8 +82,6 @@ def create_project(
     if template_key is not None and not isinstance(template_key, str):
         raise InvalidSchema()
     project_id = str(uuid.uuid4())
-    stage_id = str(uuid.uuid4())
-    config_id = str(uuid.uuid4())
     session.add(
         Project(
             id=project_id,
@@ -79,30 +94,18 @@ def create_project(
         )
     )
     session.flush()
-    stage = Stage(
-        id=stage_id,
-        project_id=project_id,
-        head_config_version_id=None,
-        created_at=now,
-    )
-    session.add(stage)
-    session.flush()
-    session.add(
-        StageConfigVersion(
-            id=config_id,
+    stages = [
+        _insert_named_stage(
+            session,
             project_id=project_id,
-            stage_id=stage_id,
-            version_no=1,
-            position=0,
-            goal_json=canonical_json({"goal": stored_title}),
-            effective_project_revision=1,
-            schema_version=1,
-            created_at=now,
+            position=position,
+            name=name,
+            goal=stored_title,
+            now=now,
         )
-    )
-    session.flush()
-    stage.head_config_version_id = config_id
-    session.flush()
+        for position, name in enumerate(PRODUCT_STAGE_NAMES)
+    ]
+    stage_id, config_id = stages[0]
     blank = _insert_blank_page(
         session,
         project_id=project_id,
@@ -163,3 +166,43 @@ def create_project(
         membership_id=membership_id,
         grant_id=grant_id,
     )
+
+
+def _insert_named_stage(
+    session: Session,
+    *,
+    project_id: str,
+    position: int,
+    name: str,
+    goal: str,
+    now: float,
+) -> tuple[str, str]:
+    """Insert one stage and its first config. The head is set after the config exists."""
+
+    stage_id = str(uuid.uuid4())
+    config_id = str(uuid.uuid4())
+    stage = Stage(
+        id=stage_id,
+        project_id=project_id,
+        head_config_version_id=None,
+        created_at=now,
+    )
+    session.add(stage)
+    session.flush()
+    session.add(
+        StageConfigVersion(
+            id=config_id,
+            project_id=project_id,
+            stage_id=stage_id,
+            version_no=1,
+            position=position,
+            goal_json=canonical_json({"goal": goal, "name": name}),
+            effective_project_revision=1,
+            schema_version=1,
+            created_at=now,
+        )
+    )
+    session.flush()
+    stage.head_config_version_id = config_id
+    session.flush()
+    return stage_id, config_id

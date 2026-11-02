@@ -17,6 +17,7 @@ from sinuo.application.candidates import (
 )
 from sinuo.application.candidates.errors import NOT_IMPLEMENTED, CandidateCommandError
 from sinuo.application.versions.drafts import update_draft
+from sinuo.application.versions.history import read_history
 from sinuo.application.versions.layouts import save_layout
 from sinuo.domain.auth.errors import ActionForbidden, InvalidSchema, SourceRedacted
 from sinuo.domain.auth.principal import Principal
@@ -105,6 +106,53 @@ def _business(engine) -> dict[str, object]:
 
 def _assert_same(before: dict[str, object], after: dict[str, object]) -> None:
     assert before == after
+
+
+def _frozen_path(engine) -> dict[str, list[tuple[object, ...]]]:
+    with engine.connect() as connection:
+        pages = connection.execute(
+            text(
+                """
+                SELECT id, stage_id, head_version_id, status, title
+                FROM pages WHERE project_id = :project ORDER BY id
+                """
+            ),
+            {"project": PROJECT_A},
+        ).all()
+        versions = connection.execute(
+            text(
+                """
+                SELECT id, page_id, version_no, parent_version_id, content_hash
+                FROM page_versions WHERE project_id = :project ORDER BY id
+                """
+            ),
+            {"project": PROJECT_A},
+        ).all()
+        stages = connection.execute(
+            text(
+                """
+                SELECT id, head_config_version_id
+                FROM stages WHERE project_id = :project ORDER BY id
+                """
+            ),
+            {"project": PROJECT_A},
+        ).all()
+        configs = connection.execute(
+            text(
+                """
+                SELECT id, stage_id, version_no, position, goal_json
+                FROM stage_config_versions WHERE project_id = :project
+                ORDER BY version_no, id
+                """
+            ),
+            {"project": PROJECT_A},
+        ).all()
+    return {
+        "pages": [tuple(row) for row in pages],
+        "versions": [tuple(row) for row in versions],
+        "stages": [tuple(row) for row in stages],
+        "configs": [tuple(row) for row in configs],
+    }
 
 
 @pytest.fixture
@@ -219,8 +267,9 @@ def _edge_proposal(
     source: str = "synthetic-node-1",
     target: str = "synthetic-node-2",
     edge_id: str = "synthetic-edge-1",
+    kind: str | None = None,
 ) -> dict:
-    return {
+    body = {
         "base_version_id": "synthetic-pv-a2",
         "edge_id": edge_id,
         "page_id": PAGE_A,
@@ -228,6 +277,9 @@ def _edge_proposal(
         "source_node_id": source,
         "target_node_id": target,
     }
+    if kind is not None:
+        body["kind"] = kind
+    return body
 
 
 def _attach_proposal(
@@ -1587,6 +1639,45 @@ def test_add_typed_edge_commits_into_the_draft(ready):
     assert _status(ready, "synthetic-add-edge") == ("committed", 2)
 
 
+def test_add_typed_edge_with_kind_commits_into_the_draft(ready):
+    _replace_draft(
+        ready,
+        {
+            "schema_version": 1,
+            "nodes": [
+                {"node_id": "synthetic-node-1", "artifact_version_id": "synthetic-art-v1"},
+                {"node_id": "synthetic-node-2"},
+            ],
+            "edges": [],
+        },
+    )
+    before = _business(ready)
+    view = _preview(
+        ready,
+        "synthetic-add-edge-kind",
+        "add_typed_edge",
+        None,
+        _edge_proposal(edge_id="synthetic-edge-kind", kind="refutes"),
+        expected_page_version_id="synthetic-pv-a2",
+        expected_draft_content_revision=6,
+    )
+    with write_uow(ready) as session:
+        response, _replayed = _commit(
+            session,
+            "synthetic-add-edge-kind",
+            view,
+            key="synthetic-add-edge-kind-key",
+            draft_revision=6,
+        )
+    assert "page_version_id" not in response.body
+    _assert_draft_only(before, _business(ready))
+    document = _draft_document(ready)
+    edge = document["edges"][0]
+    assert edge["edge_id"] == "synthetic-edge-kind"
+    assert edge["kind"] == "refutes"
+    assert _status(ready, "synthetic-add-edge-kind") == ("committed", 2)
+
+
 @pytest.mark.integration
 def test_add_typed_edge_rejects_a_missing_endpoint_without_new_rows(ready):
     _keep_candidate(
@@ -1854,3 +1945,141 @@ def test_suggest_stage_transition_confirms_like_stage_blank(ready):
     assert document["nodes"] == []
     assert document["edges"] == []
     assert _status(ready, "synthetic-suggest") == ("committed", 2)
+
+
+@pytest.mark.integration
+def test_path_candidates_leave_pages_and_stages_until_confirm(ready):
+    frozen = _frozen_path(ready)
+    stage = _preview(
+        ready,
+        "synthetic-path-stage",
+        "create_page_from_versions",
+        "stage_blank",
+        _stage_proposal(),
+    )
+    fork = _preview(
+        ready,
+        "synthetic-path-fork",
+        "create_page_from_versions",
+        "history_branch",
+        _history_proposal(),
+        {"target_title": "synthetic fork title"},
+    )
+    merge = _preview(
+        ready,
+        "synthetic-path-merge",
+        "create_page_from_versions",
+        "merge_blank",
+        _merge_proposal(),
+        {"target_title": "synthetic merge title"},
+    )
+    with write_uow(ready) as session:
+        source_history = read_history(session, project_id=PROJECT_A, page_id=PAGE_A)
+        kept_history = read_history(session, project_id=PROJECT_A, page_id=PAGE_B)
+        assert not session.new
+        assert not session.dirty
+        assert not session.deleted
+    assert [item.page_version_id for item in source_history] == [
+        "synthetic-pv-a1",
+        "synthetic-pv-a2",
+    ]
+    assert [item.content_hash for item in source_history] == [
+        row[4] for row in frozen["versions"] if row[1] == PAGE_A
+    ]
+    assert [item.page_version_id for item in kept_history] == ["synthetic-pv-b1"]
+    assert _frozen_path(ready) == frozen
+    assert _status(ready, "synthetic-path-stage") == ("pending", 1)
+    assert _status(ready, "synthetic-path-fork") == ("pending", 1)
+    assert _status(ready, "synthetic-path-merge") == ("pending", 1)
+
+    with write_uow(ready) as session:
+        stage_result, _replayed = _commit(
+            session,
+            "synthetic-path-stage",
+            stage,
+            key="synthetic-path-stage-key",
+        )
+    with write_uow(ready) as session:
+        fork_result, _replayed = _commit(
+            session,
+            "synthetic-path-fork",
+            fork,
+            key="synthetic-path-fork-key",
+            patch={"target_title": "synthetic fork title"},
+            version_id="synthetic-pv-b1",
+            draft_revision=None,
+        )
+    with write_uow(ready) as session:
+        merge_result, _replayed = _commit(
+            session,
+            "synthetic-path-merge",
+            merge,
+            key="synthetic-path-merge-key",
+            patch={"target_title": "synthetic merge title"},
+        )
+
+    confirmed = _frozen_path(ready)
+    assert confirmed["stages"] == frozen["stages"]
+    assert confirmed["configs"] == frozen["configs"]
+    assert set(frozen["pages"]).issubset(confirmed["pages"])
+    assert set(frozen["versions"]).issubset(confirmed["versions"])
+    with ready.connect() as connection:
+        stage_edge = connection.execute(
+            text(
+                """
+                SELECT source_version_id, kind FROM page_edges
+                WHERE target_version_id = :version
+                """
+            ),
+            {"version": stage_result.body["page_version_id"]},
+        ).one()
+        stage_body = connection.execute(
+            text("SELECT content_json FROM page_versions WHERE id = :version"),
+            {"version": stage_result.body["page_version_id"]},
+        ).scalar_one()
+        stage_page = connection.execute(
+            text("SELECT stage_id, title FROM pages WHERE id = :page"),
+            {"page": stage_result.body["page_id"]},
+        ).one()
+        fork_edge = connection.execute(
+            text(
+                """
+                SELECT source_version_id, kind FROM page_edges
+                WHERE target_version_id = :version
+                """
+            ),
+            {"version": fork_result.body["page_version_id"]},
+        ).one()
+        merge_edges = connection.execute(
+            text(
+                """
+                SELECT source_version_id, kind FROM page_edges
+                WHERE target_version_id = :version ORDER BY source_version_id
+                """
+            ),
+            {"version": merge_result.body["page_version_id"]},
+        ).all()
+        source_head = connection.execute(
+            text("SELECT head_version_id FROM pages WHERE id = :page"),
+            {"page": PAGE_B},
+        ).scalar_one()
+    assert stage_page.stage_id == "synthetic-stage"
+    assert stage_edge.source_version_id == "synthetic-pv-a2"
+    assert stage_edge.kind == "stage_source"
+    assert json.loads(stage_body)["nodes"] == []
+    assert fork_edge.source_version_id == "synthetic-pv-b1"
+    assert fork_edge.kind == "branches_from"
+    assert source_head == "synthetic-pv-b1"
+    assert [(row.source_version_id, row.kind) for row in merge_edges] == [
+        ("synthetic-pv-a2", "merge_source"),
+        ("synthetic-pv-b1", "merge_source"),
+    ]
+    with write_uow(ready) as session:
+        revisited = read_history(session, project_id=PROJECT_A, page_id=PAGE_B)
+        assert not session.dirty
+        assert not session.new
+    assert [item.page_version_id for item in revisited] == ["synthetic-pv-b1"]
+    assert revisited[0].content_hash == kept_history[0].content_hash
+    assert _status(ready, "synthetic-path-stage") == ("committed", 2)
+    assert _status(ready, "synthetic-path-fork") == ("committed", 2)
+    assert _status(ready, "synthetic-path-merge") == ("committed", 2)

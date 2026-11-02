@@ -14,6 +14,7 @@ from sinuo.agents.contracts import SpecialistResult
 from sinuo.application.agents.execute import (
     AgentRunRequest,
     RunTaskSpec,
+    bind_theory_root,
     finish_agent_run,
     open_agent_run,
 )
@@ -292,6 +293,18 @@ def test_evidence_and_method_runs_include_theory_ids(engine, monkeypatch, tmp_pa
         _assert_hit(theory)
         assert _stored_theory(engine, finished.run_id, role) == theory
     assert touched == []
+
+
+def test_bound_theory_root_is_used_when_the_environment_is_empty(engine, monkeypatch, tmp_path):
+    corpus = tmp_path / "theory"
+    _write_corpus(corpus)
+    monkeypatch.delenv("SINUO_THEORY_ROOT", raising=False)
+    _seed(engine)
+    with bind_theory_root(str(corpus)):
+        finished, tools = _run(engine, "bound", NOW + 10)
+    assert finished.execution_status == "completed"
+    for role in ("evidence", "method"):
+        _assert_hit(tools[role]["theory"])
 
 
 def test_missing_theory_root_keeps_project_retrieval_and_skips_course_disk(

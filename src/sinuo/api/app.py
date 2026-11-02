@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -24,9 +25,13 @@ from sinuo.api.suggestions.errors import register_suggestion_exception_handlers
 from sinuo.api.suggestions.routes import router as suggestion_router
 from sinuo.api.versions.errors import register_version_exception_handlers
 from sinuo.api.versions.routes import router as version_router
+from sinuo.api.workspace.routes import router as workspace_router
+from sinuo.application.trace.routes import router as trace_router
 from sinuo.config import Settings
 from sinuo.infrastructure.database import build_engine
 from sinuo.infrastructure.models import SCHEMA_REVISION, Base
+
+_DESK = Path(__file__).resolve().parents[3] / "web" / "desk.html"
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -36,6 +41,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app: FastAPI):
         engine = build_engine(configuration.database_url, configuration.sqlite_busy_timeout_ms)
         app.state.engine = engine
+        uploads = _DESK.parents[1] / "var" / "uploads"
+        objects = _DESK.parents[1] / "var" / "objects"
+        uploads.mkdir(parents=True, exist_ok=True)
+        objects.mkdir(parents=True, exist_ok=True)
+        if getattr(app.state, "uploads_root", None) is None:
+            app.state.uploads_root = uploads
+        if getattr(app.state, "objects_root", None) is None:
+            app.state.objects_root = objects
         try:
             yield
         finally:
@@ -56,6 +69,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(upload_router)
     app.include_router(suggestion_router)
     app.include_router(candidate_router)
+    app.include_router(trace_router)
+    app.include_router(workspace_router)
     register_auth_exception_handlers(app)
     register_version_exception_handlers(app)
     register_review_exception_handlers(app)
@@ -91,5 +106,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except SQLAlchemyError:
             return not_ready("database_unavailable")
         return {"status": "ready", "scope": "foundation", "schema_revision": SCHEMA_REVISION}
+
+    def desk_page() -> FileResponse:
+        response = FileResponse(_DESK, media_type="text/html; charset=utf-8")
+        response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @app.get("/", include_in_schema=False)
+    def workspace_home() -> FileResponse:
+        return desk_page()
+
+    @app.get("/projects", include_in_schema=False)
+    @app.get("/projects/{project_id}", include_in_schema=False)
+    @app.get("/projects/{project_id}/pages/{page_id}", include_in_schema=False)
+    def workspace_page(project_id: str = "", page_id: str = "") -> FileResponse:
+        return desk_page()
 
     return app

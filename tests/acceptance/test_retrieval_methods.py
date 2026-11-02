@@ -603,6 +603,41 @@ def seed_search_world(engine) -> None:
         rebuild_evidence_index(session)
 
 
+def test_search_evidence_multi_version_filter(engine):
+    seed_search_world(engine)
+    principal = Principal(READER_ID, SESSION_ID, 1)
+    with write_uow(engine) as session:
+        authorizer = SessionAuthorizer(session)
+
+        def run(*, versions):
+            return search_evidence(
+                session,
+                authorizer,
+                principal,
+                PROJECT_A,
+                QUERY,
+                20,
+                artifact_version_ids=versions,
+            )
+
+        # 限定 HIT_VERSION：命中
+        result = run(versions=(HIT_VERSION,))
+        assert [item.artifact_version_id for item in result.hits] == [HIT_VERSION]
+        assert result.counts["hit"] == 1
+        # 限定 MISS_VERSION（摘录不匹配 query）：无命中，记为 no_hit
+        missed = run(versions=(MISS_VERSION,))
+        assert missed.hits == ()
+        assert missed.counts["no_hit"] == 1
+        # 多版本：HIT + PERCENT，query 只命中 HIT
+        multi = run(versions=(HIT_VERSION, PERCENT_VERSION))
+        assert [item.artifact_version_id for item in multi.hits] == [HIT_VERSION]
+        # 空集合：什么都不匹配
+        empty = run(versions=())
+        assert empty.hits == ()
+        assert empty.versions == ()
+        assert empty.counts == {"hit": 0, "no_hit": 0, "not_indexed": 0}
+
+
 def _render(result) -> str:
     payload = {
         "hits": [

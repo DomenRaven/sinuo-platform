@@ -15,6 +15,7 @@ class Settings(BaseSettings):
 
     environment: str = "development"
     database_url: str = "sqlite:///./var/sinuo.db"
+    theory_root: str = ""
     sqlite_busy_timeout_ms: int = Field(default=5000, ge=1, le=60000)
     model_enabled: bool = False
     model_name: str = ""

@@ -12,6 +12,7 @@ from typing import Any
 
 from sinuo.application.candidates.errors import NOT_IMPLEMENTED, CandidateCommandError
 from sinuo.domain.auth.errors import InvalidSchema
+from sinuo.domain.page_nodes import EDGE_KINDS
 from sinuo.domain.schema_types import canonical_json
 
 _GRAPH_ACTIONS = frozenset({"add_node", "add_typed_edge", "attach_artifact_version"})
@@ -19,7 +20,7 @@ _DRAFT_ACTIONS = frozenset({"draft_decision", *_GRAPH_ACTIONS})
 _PAGE_ACTIONS = frozenset({"create_page_from_versions", "suggest_stage_transition"})
 _BLANK_MODES = frozenset({"stage_blank", "merge_blank"})
 _DRAFT_PATCH = frozenset({"node_id", "artifact_version_id"})
-_EDGE_PATCH = frozenset({"edge_id", "source_node_id", "target_node_id"})
+_EDGE_PATCH = frozenset({"edge_id", "source_node_id", "target_node_id", "kind"})
 _PAGE_PATCH = frozenset({"target_title"})
 _KIND_PATCH = frozenset({"action", "page_mode"})
 _SOURCE_KEYS = (
@@ -45,6 +46,7 @@ class ParsedProposal:
     edge_id: str | None = None
     source_node_id: str | None = None
     target_node_id: str | None = None
+    edge_kind: str | None = None
     target_stage_id: str | None = None
     title: str | None = None
     source_version_id: str | None = None
@@ -75,6 +77,8 @@ class ParsedProposal:
                 "source_node_id": self.source_node_id,
                 "target_node_id": self.target_node_id,
             }
+            if self.edge_kind is not None:
+                body["kind"] = self.edge_kind
             return _with_anchors(body, self.evidence_anchor_ids)
         if self.kind == "draft":
             body = {
@@ -220,7 +224,7 @@ def _parse_graph(action: str, page_mode: str | None, document: object) -> Parsed
                 "source_node_id",
                 "target_node_id",
             },
-            optional={"evidence_anchor_ids"},
+            optional={"evidence_anchor_ids", "kind"},
         )
         return ParsedProposal(
             action=action,
@@ -230,6 +234,7 @@ def _parse_graph(action: str, page_mode: str | None, document: object) -> Parsed
             edge_id=_token(document["edge_id"], limit=64),
             source_node_id=_token(document["source_node_id"], limit=64),
             target_node_id=_token(document["target_node_id"], limit=64),
+            edge_kind=_edge_kind(document.get("kind")),
             evidence_anchor_ids=_anchor_ids(document),
         )
     _keys(
@@ -266,7 +271,10 @@ def apply_user_patch(
         _keys(body, required=set(), optional=set(_EDGE_PATCH) | set(_KIND_PATCH))
         for key in _EDGE_PATCH:
             if key in body:
-                body[key] = _token(body[key], limit=64)
+                if key == "kind":
+                    body[key] = _edge_kind(body[key])
+                else:
+                    body[key] = _token(body[key], limit=64)
         effective = ParsedProposal(
             action=proposal.action,
             page_mode=proposal.page_mode,
@@ -275,6 +283,7 @@ def apply_user_patch(
             edge_id=str(body.get("edge_id", proposal.edge_id)),
             source_node_id=str(body.get("source_node_id", proposal.source_node_id)),
             target_node_id=str(body.get("target_node_id", proposal.target_node_id)),
+            edge_kind=body.get("kind", proposal.edge_kind),
             evidence_anchor_ids=proposal.evidence_anchor_ids,
         )
     elif proposal.kind == "draft":
@@ -446,6 +455,15 @@ def _token(value: object, *, limit: int) -> str:
     if not isinstance(value, str) or value.strip() != value or not value or len(value) > limit:
         raise InvalidSchema()
     if any(char.isspace() for char in value):
+        raise InvalidSchema()
+    return value
+
+
+def _edge_kind(value: object) -> str | None:
+    """An optional typed-edge kind. Missing stays None (reads back as derives)."""
+    if value is None:
+        return None
+    if not isinstance(value, str) or value not in EDGE_KINDS:
         raise InvalidSchema()
     return value
 

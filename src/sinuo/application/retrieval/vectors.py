@@ -30,8 +30,11 @@ _MAX_TOKENS = 512
 _NGRAM_DIM = 512
 # Lecture 11 allows a similarity floor but does not publish a cosine cutoff.
 # The character encoder was measured on short synthetic sentences: a shared
-# phrase scores about 0.70 and a disjoint sentence stays under 0.10.
-_NGRAM_MIN_SCORE = 0.45
+# phrase scores about 0.70 and a disjoint sentence stays under 0.10. Real
+# course queries are often short keywords (2-4 characters) whose top page
+# scores 0.14-0.21 while a disjoint chunk stays under 0.05, so the floor is
+# set at 0.12 to keep those keywords while still rejecting unrelated text.
+_NGRAM_MIN_SCORE = 0.12
 _BGE_MIN_SCORE = 0.55
 
 _Encode = Callable[[list[str], bool], list[list[float]]]

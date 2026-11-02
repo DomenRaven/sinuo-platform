@@ -610,3 +610,23 @@ def _record_count(engine) -> int:
     with engine.connect() as connection:
         value = connection.execute(text("SELECT count(*) FROM test_records")).scalar_one()
     return int(value)
+
+
+def test_anchor_rebuilds_evidence_index(engine, database_url):
+    """建锚点后立即重建证据全文索引，使证据可被 search_evidence 命中。"""
+    world, app = _prepare(engine, database_url)
+    body = _anchor_body(world.released_version_id, EXCERPT, {"page": 4})
+    with TestClient(app) as client:
+        csrf = _login(client, LEAD_LOGIN, LEAD_PASSWORD)
+        created = client.post(ANCHORS, headers=_headers(csrf, "synthetic-anchor-index"), json=body)
+        assert created.status_code == 201, created.text
+        anchor_id = created.json()["data"]["evidence_anchor_id"]
+    with engine.connect() as connection:
+        indexed = connection.execute(
+            text(
+                "SELECT count(*) FROM evidence_excerpt_index "
+                "WHERE anchor_id = :anchor_id AND artifact_version_id = :version_id"
+            ),
+            {"anchor_id": anchor_id, "version_id": world.released_version_id},
+        ).scalar_one()
+    assert int(indexed) == 1

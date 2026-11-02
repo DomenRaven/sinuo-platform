@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>思诺工作台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f5;
+      --paper: #ffffff;
+      --ink: #17212b;
+      --muted: #52606b;
+      --line: #d5dbd6;
+      --action: #174c6e;
+      --wait: #a9651d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    main {
+      max-width: 46rem;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 3rem;
+    }
+    h1 { font-size: 1.75rem; line-height: 1.3; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.2rem; margin: 2rem 0 0.75rem; }
+    p { margin: 0.5rem 0; }
+    .lede { color: var(--muted); max-width: 40rem; }
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 1rem 1.1rem 1.15rem;
+      margin-top: 1rem;
+    }
+    ol, ul { margin: 0.5rem 0 0; padding-left: 1.3rem; }
+    li + li { margin-top: 0.25rem; }
+    .table-wrap { overflow-x: auto; margin-top: 0.5rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; vertical-align: top; padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--line); }
+    th { font-weight: 650; white-space: nowrap; }
+    table.nodes td:first-child,
+    table.nodes td:nth-child(2) { white-space: nowrap; }
+    code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 0.92em; overflow-wrap: anywhere; }
+    .gap {
+      margin-top: 0.8rem;
+      padding: 0.65rem 0.8rem;
+      background: var(--bg);
+      border-left: 3px solid var(--action);
+    }
+    .rule { color: var(--wait); font-weight: 650; }
+    .note { color: var(--muted); font-size: 0.92rem; }
+    details { margin-top: 0.8rem; }
+    summary { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>思诺工作台</h1>
+    <p class="lede">只读页面。八个阶段名、七类节点和负责职责写在施工合同里。运行记录和待确认候选只在本机接口真正返回时出现。</p>
+
+    <section aria-labelledby="stages-title">
+      <h2 id="stages-title">八个固定阶段</h2>
+      <ol>
+        <li>任务与情境</li>
+        <li>用户与场景研究</li>
+        <li>问题及机会定义</li>
+        <li>设计要求</li>
+        <li>概念探索</li>
+        <li>深化与原型</li>
+        <li>测试与迭代</li>
+        <li>表达与复盘</li>
+      </ol>
+      <p class="note">顺序来自施工合同。创建项目时用这一套名字。</p>
+      <p id="stages-live" class="gap" role="status">这一块还没有接口。</p>
+    </section>
+
+    <section aria-labelledby="nodes-title">
+      <h2 id="nodes-title">七类节点</h2>
+      <div class="table-wrap">
+      <table class="nodes">
+        <thead>
+          <tr><th>显示名</th><th>键</th><th>合同里的负责</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>问题</td>
+            <td><code>problem</code></td>
+            <td>澄清负责课题边界。合同没有写「问题」这一类由谁写入。</td>
+          </tr>
+          <tr>
+            <td>证据</td>
+            <td><code>evidence</code></td>
+            <td>证据</td>
+          </tr>
+          <tr>
+            <td>洞察</td>
+            <td><code>insight</code></td>
+            <td>证据</td>
+          </tr>
+          <tr>
+            <td>要求</td>
+            <td><code>requirement</code></td>
+            <td>过程批评，看要求是否可测</td>
+          </tr>
+          <tr>
+            <td>作品</td>
+            <td><code>artifact</code></td>
+            <td>人确认后才写入</td>
+          </tr>
+          <tr>
+            <td>测试</td>
+            <td><code>test</code></td>
+            <td>方法负责测试计划。测试记录在人确认后才写入。</td>
+          </tr>
+          <tr>
+            <td>决定</td>
+            <td><code>decision</code></td>
+            <td>人确认后才写入</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <h2 id="duties-title">负责职责</h2>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>阶段或节点</th><th>负责职责</th><th>人留下的决定</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>任务与情境、课题边界</td><td>澄清</td><td>确认范围</td></tr>
+          <tr><td>证据、洞察、用户研究材料</td><td>证据</td><td>选择解释</td></tr>
+          <tr><td>方法卡、概念路径、测试计划</td><td>方法</td><td>选择保留哪条</td></tr>
+          <tr><td>要求是否可测、阶段建议、缺口</td><td>过程批评</td><td>确认进入、修改或返回</td></tr>
+          <tr><td>作品、测试记录、决定</td><td>不由模型写入</td><td>人确认后才落正式记录</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p id="nodes-live" class="gap" role="status">这一块还没有接口。</p>
+    </section>
+
+    <section aria-labelledby="suggest-title">
+      <h2 id="suggest-title">阶段建议</h2>
+      <p>过程批评负责阶段建议：要求是否可测、缺口，以及进入、修改或返回。人确认之前，系统不翻阶段。</p>
+      <p id="suggestions-live" class="gap" role="status">这一块还没有接口。</p>
+    </section>
+
+    <section aria-labelledby="runs-title">
+      <h2 id="runs-title">运行记录</h2>
+      <p>这里要看见输入版本、走了哪些职责、错误或缺口。</p>
+      <p id="runs-live" class="gap" role="status">这一块还没有接口。</p>
+      <details>
+        <summary>开工时核对过的相近读取</summary>
+        <ul>
+          <li><code>GET /api/v1/agent-runs/{run_id}/events</code> 回放单次运行的事件，调用前要有运行编号。</li>
+          <li><code>GET /api/v1/projects/{project_id}/agent-runs/{parent_run_id}/fake-chain</code> 返回假模型链的步骤角色、状态和候选正文。响应字段里没有输入版本、错误和缺口。</li>
+        </ul>
+        <p class="note">本页不请求这两条，也不把它们画成运行记录。</p>
+      </details>
+    </section>
+
+    <section aria-labelledby="candidates-title">
+      <h2 id="candidates-title">待确认候选</h2>
+      <p class="rule">确认前，正式页不会自己变，阶段也不会自己翻。</p>
+      <p id="candidates-live" class="gap" role="status">这一块还没有接口。</p>
+      <p class="note">已有 <code>POST /api/v1/candidates/{candidate_id}/preview</code>、<code>/commit</code>、<code>/reject</code>。预览会写入新的预览行。本页不调用预览、确认或拒绝。</p>
+    </section>
+
+    <section aria-labelledby="probe-title">
+      <h2 id="probe-title">本机接口核对</h2>
+      <p id="probe" role="status">正在读本机 OpenAPI。</p>
+      <ul id="get-list"></ul>
+      <noscript><p>没有脚本时不请求接口。上面的缺接口说明来自开工时核对的路由。</p></noscript>
+    </section>
+  </main>
+  <script>
+    const DOCUMENTED = "http://127.0.0.1:8000";
+    const origin = location.origin === DOCUMENTED ? location.origin : DOCUMENTED;
+
+    function matches(paths, pattern) {
+      return paths.filter(function (path) { return pattern.test(path); });
+    }
+
+    function describe(found) {
+      if (found.length === 0) return "这一块还没有接口。";
+      const listed = found.map(function (path) { return "GET " + path; }).join("、");
+      return "路由里有 " + listed + "。本页不了解响应字段，没有画成记录。";
+    }
+
+    function showGets(paths) {
+      const list = document.getElementById("get-list");
+      list.replaceChildren();
+      if (paths.length === 0) {
+        const item = document.createElement("li");
+        item.textContent = "OpenAPI 里没有 GET /api/v1。";
+        list.append(item);
+        return;
+      }
+      paths.forEach(function (path) {
+        const item = document.createElement("li");
+        const code = document.createElement("code");
+        code.textContent = "GET " + path;
+        item.append(code);
+        list.append(item);
+      });
+    }
+
+    function apply(gets) {
+      document.getElementById("stages-live").textContent = describe(
+        matches(gets, /\/stages(\/|\{|$)/)
+      );
+      document.getElementById("nodes-live").textContent = describe(
+        matches(gets, /\/nodes(\/|\{|$)/)
+      );
+      document.getElementById("suggestions-live").textContent = describe(
+        gets.filter(function (path) {
+          return path.indexOf("suggestion") !== -1 && path.indexOf("suggestion-preferences") === -1;
+        })
+      );
+      document.getElementById("runs-live").textContent = describe(
+        gets.filter(function (path) {
+          return path.indexOf("agent-runs") !== -1
+            && path.indexOf("/events") === -1
+            && path.indexOf("fake-chain") === -1;
+        })
+      );
+      document.getElementById("candidates-live").textContent = describe(
+        matches(gets, /\/candidates(\/|\{|$)/)
+      );
+    }
+
+    fetch(origin + "/openapi.json", {
+      method: "GET",
+      credentials: "omit",
+      headers: { Accept: "application/json" }
+    }).then(function (response) {
+      if (!response.ok) {
+        document.getElementById("probe").textContent =
+          "本机 OpenAPI 返回 " + response.status + "。页面不编造运行记录或候选。";
+        return null;
+      }
+      return response.json();
+    }).then(function (spec) {
+      if (!spec) return;
+      const paths = spec.paths || {};
+      const gets = Object.keys(paths).filter(function (path) {
+        return path.indexOf("/api/v1") === 0 && paths[path] && paths[path].get;
+      }).sort();
+      document.getElementById("probe").textContent =
+        "已读 GET " + origin + "/openapi.json。下面是其中的 GET /api/v1。";
+      showGets(gets);
+      apply(gets);
+    }).catch(function () {
+      document.getElementById("probe").textContent =
+        "没有读到 " + origin + "/openapi.json。页面不编造运行记录或候选。";
+    });
+  </script>
+</body>
+</html>

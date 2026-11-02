@@ -24,12 +24,13 @@ from sinuo.application.auth.sessions import require_csrf, resolve_principal, sli
 from sinuo.application.idempotency import CommandResponse, CommandScope
 from sinuo.application.versions.branches import branch_from_version
 from sinuo.application.versions.checkpoints import checkpoint_page
-from sinuo.application.versions.drafts import save_draft
+from sinuo.application.versions.drafts import save_draft, save_typed_draft
 from sinuo.application.versions.history import read_history
 from sinuo.application.versions.pages import create_parallel_page
 from sinuo.application.versions.projects import create_project
 from sinuo.domain.auth.errors import ActionForbidden, NotFoundOrHidden
 from sinuo.domain.auth.resource import ResourceRef, account_resource
+from sinuo.domain.page_nodes import canonical_typed_document, content_digest
 from sinuo.domain.public_contract import CSRF_HEADER, Action
 from sinuo.domain.schema_types import canonical_document, document_hash
 from sinuo.infrastructure.database import write_uow
@@ -153,8 +154,13 @@ async def post_page(project_id: str, request: Request) -> JSONResponse:
 @router.patch("/pages/{page_id}/draft")
 async def patch_draft(page_id: str, request: Request) -> JSONResponse:
     body = parse_draft(await request.body())
-    content = canonical_document(body.content)
-    content_hash = document_hash(body.content)
+    typed = _document_is_typed(body.content)
+    if typed:
+        content = canonical_typed_document(body.content, writer="human")
+        content_hash = content_digest(content)
+    else:
+        content = canonical_document(body.content)
+        content_hash = document_hash(body.content)
     now = time.time()
     with write_uow(get_engine(request)) as session:
         principal = _guard(request, session, now)
@@ -175,17 +181,30 @@ async def patch_draft(page_id: str, request: Request) -> JSONResponse:
         )
 
         def handler(active) -> CommandResponse:
-            revision, audit_event_id = save_draft(
-                active,
-                page_id=page_id,
-                project_id=page.project_id,
-                base_version_id=body.base_version_id,
-                expected_revision=body.expected_revision,
-                content_json=content,
-                content_hash=content_hash,
-                actor_id=principal.account_id,
-                now=now,
-            )
+            if typed:
+                revision, audit_event_id = save_typed_draft(
+                    active,
+                    page_id=page_id,
+                    project_id=page.project_id,
+                    base_version_id=body.base_version_id,
+                    expected_revision=body.expected_revision,
+                    document=body.content,
+                    writer="human",
+                    actor_id=principal.account_id,
+                    now=now,
+                )
+            else:
+                revision, audit_event_id = save_draft(
+                    active,
+                    page_id=page_id,
+                    project_id=page.project_id,
+                    base_version_id=body.base_version_id,
+                    expected_revision=body.expected_revision,
+                    content_json=content,
+                    content_hash=content_hash,
+                    actor_id=principal.account_id,
+                    now=now,
+                )
             return CommandResponse(
                 200,
                 {
@@ -347,3 +366,14 @@ def get_history(page_id: str, request: Request) -> JSONResponse:
         "meta": {"request_id": request_id_for(request), "version": __version__},
     }
     return _nostore(JSONResponse(body))
+
+
+def _document_is_typed(content: object) -> bool:
+    """True when any node carries a ``kind``, so it must go through the typed contract."""
+
+    if not isinstance(content, dict):
+        return False
+    nodes = content.get("nodes")
+    if not isinstance(nodes, list):
+        return False
+    return any(isinstance(node, dict) and "kind" in node for node in nodes)

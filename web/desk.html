@@ -1,0 +1,2535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235e5ce6'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700'%3E%E6%80%9D%3C/text%3E%3C/svg%3E">
+  <title>思诺</title>
+  <style>
+    :root {
+      --bg: #f7f1dd;
+      --bg-deep: #f1e8cc;
+      --card: #fffef9;
+      --ink: #1d1d1f;
+      --muted: #6e6e73;
+      --muted-2: #86868b;
+      --line: #d2d2d7;
+      --line-soft: #e8e8ed;
+      --action: #0071e3;
+      --action-hover: #0077ed;
+      --action-press: #0060c9;
+      --action-soft: rgba(0, 113, 227, 0.10);
+      --soft: #eef4fb;
+      --danger: #d70015;
+      --warn: #8e6a00;
+      --ok: #1a7f37;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.12);
+      --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 18px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      letter-spacing: -0.006em;
+    }
+    a { color: var(--action); text-decoration: none; transition: color 0.15s var(--ease); }
+    a:hover { color: var(--action-hover); }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.28);
+    }
+    .skip {
+      position: absolute;
+      left: 16px;
+      top: -48px;
+      background: var(--card);
+      padding: 8px 14px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      transition: top 0.2s var(--ease);
+      z-index: 10;
+    }
+    .skip:focus { top: 14px; }
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 36px 32px 88px; }
+    header.bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .brand { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; text-decoration: none; color: var(--ink); }
+    .who { color: var(--muted); margin-right: 12px; font-size: 16px; }
+    h1 { font-size: 50px; line-height: 1.08; letter-spacing: -0.028em; font-weight: 700; margin: 0 0 12px; }
+    h2 { font-size: 30px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 680; margin: 0 0 10px; }
+    h3 { font-size: 21px; line-height: 1.3; font-weight: 680; margin: 0 0 8px; }
+    .lead { color: var(--muted); font-size: 20px; line-height: 1.5; margin: 0 0 32px; max-width: 48rem; }
+    .path { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--muted); margin: 0 0 22px; font-size: 16px; }
+    .path a { text-decoration: none; }
+    .path a:hover { text-decoration: underline; }
+    .card, .panel {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      box-shadow: var(--shadow-sm);
+      padding: 28px;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
+    .stage-no { font-size: 14px; color: var(--muted); margin: 0; }
+    .stage-name { font-size: 22px; letter-spacing: -0.02em; font-weight: 680; margin: 4px 0 10px; }
+    .page-link, .project-link {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin-top: 14px;
+      transition: border-color 0.15s var(--ease), background 0.15s var(--ease), transform 0.15s var(--ease);
+    }
+    .page-link:hover, .project-link:hover { background: var(--soft); border-color: var(--action); transform: translateY(-1px); }
+    .status, .badge, .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 11px;
+      font-size: 13px;
+      line-height: 1.4;
+      margin: 6px 6px 0 0;
+      background: #fff;
+    }
+    form.panel { max-width: 600px; }
+    label { display: block; font-weight: 600; margin-bottom: 9px; font-size: 16px; }
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      font: inherit;
+      font-size: 17px;
+      padding: 15px 17px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      margin-bottom: 18px;
+      color: var(--ink);
+      transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+    }
+    input[type="text"]:focus, input[type="password"]:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--action);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+    }
+    textarea {
+      width: 100%;
+      font: inherit;
+      font-size: 16px;
+      padding: 14px 17px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      margin-bottom: 18px;
+      color: var(--ink);
+      resize: vertical;
+      min-height: 84px;
+      line-height: 1.55;
+      transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+    }
+    button, .button {
+      font: inherit;
+      font-weight: 600;
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 24px;
+      background: var(--action);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.15s var(--ease), transform 0.1s var(--ease), box-shadow 0.15s var(--ease);
+    }
+    button:hover, .button:hover { background: var(--action-hover); }
+    button:active, .button:active { background: var(--action-press); transform: scale(0.98); }
+    button.quiet {
+      background: transparent;
+      color: var(--action);
+      padding-inline: 12px;
+    }
+    button.quiet:hover { background: var(--action-soft); }
+    button:disabled { opacity: 0.38; cursor: default; }
+    button:disabled:hover { background: var(--action); transform: none; }
+    button.quiet:disabled:hover { background: transparent; }
+    .alert {
+      border-radius: var(--radius-md);
+      padding: 15px 17px;
+      background: #fffef9;
+      border: 1px solid var(--line);
+      margin: 0 0 18px;
+      font-size: 16px;
+    }
+    .meta { color: var(--muted); font-size: 15px; margin: 7px 0 0; }
+    section.block { margin-top: 48px; }
+    input[type="file"], input[type="checkbox"] { margin-bottom: 16px; }
+
+    /* 角色/节点配色（按职责） */
+    .role-clarification { color: #0a4a8f; background: #eaf3fc; border-color: #cfe3f8; }
+    .role-evidence { color: #0a5c48; background: #e7f6f0; border-color: #c0e9d8; }
+    .role-method { color: #4238a3; background: #efeffd; border-color: #d9d7f9; }
+    .role-critic { color: #7a4a08; background: #fdf1dd; border-color: #f8ddac; }
+    .role-human { color: #55544e; background: #f5f3ed; border-color: #e0ddd3; }
+
+    /* 阶段流程条 */
+    .flowbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+    .flow-node {
+      flex: 1 1 108px;
+      min-width: 104px;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-md);
+      background: #fff;
+      padding: 14px 12px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+    }
+    .flow-node:hover { border-color: var(--action); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .flow-node.current { border-color: var(--action); background: var(--soft); box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12); }
+    .flow-node.has-pages { border-color: #bcd6f0; }
+    .flow-idx { font-size: 12px; color: var(--muted); }
+    .flow-name { font-size: 14px; font-weight: 650; margin-top: 5px; }
+    .flow-count { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .flow-arrow { align-self: center; color: var(--muted-2); flex: 0 0 auto; font-size: 14px; }
+
+    /* 角色矩阵 */
+    .matrix { overflow-x: auto; }
+    .matrix table { border-collapse: collapse; width: 100%; min-width: 560px; }
+    .matrix th, .matrix td {
+      text-align: left;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+      font-size: 14px;
+    }
+    .matrix th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .matrix tbody tr:last-child td { border-bottom: none; }
+    .matrix tbody tr:hover td { background: #fafafa; }
+    .matrix .role-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+
+    /* 结构树 */
+    .bom { list-style: none; padding-left: 0; margin: 0; }
+    .bom li { margin: 5px 0; }
+    .bom .node-label { display: inline-flex; align-items: center; gap: 8px; }
+    .bom details { margin-left: 24px; }
+    .bom summary { cursor: pointer; color: var(--action); font-size: 14px; transition: color 0.15s var(--ease); }
+    .bom summary:hover { color: var(--action-hover); }
+    .bom .part-icon { color: var(--muted); font-size: 13px; }
+    .bom .qty { color: var(--muted); font-size: 12px; margin-left: 4px; }
+
+    /* 页内节点图（推理链） */
+    .node-graph { display: flex; flex-direction: column; }
+    .node-chain { position: relative; padding-left: 28px; padding-bottom: 16px; }
+    .node-chain::before { content: ""; position: absolute; left: 9px; top: 26px; bottom: 0; width: 2px; background: var(--line); }
+    .node-chain:last-child { padding-bottom: 0; }
+    .node-chain:last-child::before { display: none; }
+    .node-chain .n-dot { position: absolute; left: 3px; top: 8px; width: 14px; height: 14px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--line); }
+    .node-chip {
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      border: 1px solid var(--line-soft);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), border-color 0.15s var(--ease);
+    }
+    .node-chip:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); border-color: var(--action); }
+    .node-chip .n-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .node-chip .n-kind { font-weight: 680; font-size: 15px; }
+    .node-chip .n-duty { font-size: 12px; color: var(--muted); }
+    .node-chip .n-content { margin-top: 8px; font-size: 16px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .node-chip .n-content.empty { color: var(--muted-2); font-style: italic; }
+    .node-chip .n-foot { margin-top: 8px; font-size: 12px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+    .edge-note { color: var(--muted); font-size: 13px; margin-top: 10px; }
+
+    /* 关系边：拖拽连线锚点 + 边标签 */
+    .node-graph { position: relative; }
+    .node-chain .node-chip { position: relative; }
+    .node-chip .n-link-anchor {
+      position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--action); color: #fff; cursor: crosshair;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; line-height: 1; font-weight: 700;
+      box-shadow: var(--shadow-sm); z-index: 2;
+      transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+    }
+    .node-chip .n-link-anchor:hover { transform: translateY(-50%) scale(1.18); box-shadow: var(--shadow-md); }
+    .node-chip .n-link-anchor.link-active { background: var(--action-press); }
+    .node-chip.link-target { outline: 2px dashed var(--action); outline-offset: 3px; }
+    .node-chip .n-edges { margin-top: 10px; border-top: 1px dashed var(--line-soft); padding-top: 9px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .n-edges .ne-caption { width: 100%; font-size: 11px; color: var(--muted-2); letter-spacing: 0.03em; }
+    .n-edge-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; padding: 3px 9px; border-radius: 999px;
+      background: var(--soft); color: var(--action); border: 1px solid rgba(0, 113, 227, 0.22);
+      cursor: default;
+    }
+    .n-edge-tag .ne-kind { font-weight: 650; }
+    .n-edge-tag .ne-del { color: var(--muted-2); font-weight: 700; cursor: pointer; }
+    .n-edge-tag .ne-del:hover { color: var(--danger); }
+    /* 边类型选择弹层 */
+    .kind-picker { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.28); display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .kind-picker .kp-panel { background: var(--card); border-radius: 20px; padding: 22px 24px; box-shadow: var(--shadow-lg); width: 100%; max-width: 440px; }
+    .kind-picker .kp-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .kind-picker .kp-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+    .kind-picker .kp-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kind-picker .kp-option { padding: 12px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; text-align: left; transition: border-color 0.15s var(--ease), background 0.15s var(--ease); }
+    .kind-picker .kp-option:hover { border-color: var(--action); background: var(--action-soft); }
+    .kind-picker .kp-option .ko-kind { font-weight: 680; font-size: 14px; }
+    .kind-picker .kp-option .ko-desc { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .kind-picker .kp-cancel { margin-top: 14px; width: 100%; background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 12px; padding: 11px; font-weight: 600; }
+    .kind-picker .kp-cancel:hover { background: var(--line-soft); color: var(--ink); }
+    .edge-kind-note { display: inline-block; font-size: 13px; font-weight: 600; color: var(--action); background: var(--action-soft); padding: 4px 12px; border-radius: 999px; margin: 0 0 6px; }
+  
+    /* 节点编辑弹层 */
+    .node-editor {
+      position: fixed; inset: 0; z-index: 50;
+      background: rgba(0, 0, 0, 0.28);
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+    }
+    .node-editor .ne-panel {
+      width: 100%; max-width: 560px; max-height: 86vh; overflow: auto;
+      background: var(--card); border-radius: 22px; padding: 26px 28px;
+      box-shadow: var(--shadow-lg);
+    }
+    .node-editor .ne-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+    .node-editor .ne-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .node-editor textarea { min-height: 120px; }
+    .node-editor .ne-actions { display: flex; gap: 10px; margin-top: 8px; }
+    .ne-actions .ne-del { margin-left: auto; background: transparent; color: var(--danger); }
+    .ne-actions .ne-ask { background: transparent; color: var(--action); }
+
+    /* 运行工作流 */
+    .run-flow { display: flex; flex-direction: column; gap: 12px; }
+    .run-intent {
+      border-radius: var(--radius-md);
+      background: var(--soft);
+      padding: 14px 18px;
+      font-weight: 650;
+      font-size: 16px;
+    }
+    .role-card {
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      border: 1px solid var(--line-soft);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+    .role-card .r-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .role-card .r-name { font-weight: 650; font-size: 16px; }
+    .role-card .r-status { font-size: 13px; margin-left: auto; color: var(--muted); }
+    .role-card .r-summary { margin-top: 10px; line-height: 1.55; }
+    .role-card .r-sources { margin-top: 10px; }
+    .role-card .r-gaps { margin-top: 10px; }
+    .dep-arrow { color: var(--muted); text-align: center; font-size: 13px; }
+    .source-item { display: block; font-size: 14px; color: var(--action); margin-top: 3px; }
+    .source-item:hover { text-decoration: underline; }
+    .gap-item { display: block; font-size: 14px; color: #a23c1d; margin-top: 3px; }
+
+    .section-label { font-size: 12px; letter-spacing: 0.06em; color: var(--muted-2); font-weight: 650; text-transform: uppercase; margin: 0 0 6px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 4px; }
+    .legend .pill { margin: 0; }
+
+    /* 智能体能力总览 */
+    .capabilities { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; margin-top: 10px; }
+    .cap-card {
+      border-radius: 20px;
+      padding: 20px 20px 18px;
+      border: 1px solid var(--line-soft);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+    }
+    .cap-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .cap-head { display: flex; align-items: center; gap: 10px; }
+    .cap-dot { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 auto; }
+    .cap-name { font-weight: 650; font-size: 17px; }
+    .cap-what { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top: 10px; }
+    .cap-list { margin: 10px 0 0; padding: 0; list-style: none; }
+    .cap-list li { font-size: 13px; color: var(--ink); padding: 3px 0; }
+    .cap-list .cap-tag { display: inline-block; font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; margin: 2px 4px 2px 0; }
+
+    /* 意图分流快捷动作 */
+    .quick-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin: 14px 0; }
+    .quick-card {
+      border: 1px solid var(--line-soft);
+      border-radius: 18px;
+      padding: 16px 18px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.15s var(--ease), background 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+    }
+    .quick-card:hover { border-color: var(--action); background: var(--soft); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .quick-card:disabled { opacity: 0.5; cursor: default; }
+    .quick-card:disabled:hover { border-color: var(--line-soft); background: #fff; transform: none; box-shadow: var(--shadow-sm); }
+    .quick-card .q-name { font-weight: 650; font-size: 16px; display: block; }
+    .quick-card .q-hint { color: var(--muted); font-size: 13px; display: block; margin-top: 4px; }
+    .quick-card .q-roles { margin-top: 10px; }
+    .quick-card .pill { margin: 0 4px 0 0; }
+    .intent-rule { background: var(--soft); border-radius: var(--radius-md); padding: 14px 18px; margin: 14px 0; }
+    .intent-rule .rule-line { font-size: 14px; margin: 5px 0; }
+
+    /* 工具调用链 */
+    .tool-chain { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0; }
+    .tool-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-soft); border-radius: 999px; padding: 6px 13px; font-size: 13px; background: #fff; }
+    .tool-chip .tool-name { font-weight: 650; }
+    .tool-chip.hit { border-color: #b7e4d0; background: #e7f6f0; color: #0a5c48; }
+    .tool-chip.empty { border-color: #f2d9a0; background: #fdf1dd; color: #7a4a08; }
+    .tool-chip.completed { border-color: #cfe3f8; background: #eaf3fc; color: #0a4a8f; }
+    .tool-arrow { color: var(--muted-2); }
+
+    /* 图表：阶段覆盖度 */
+    .bar-chart { margin: 12px 0 6px; }
+    .bar-row { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+    .bar-label { flex: 0 0 136px; font-size: 13px; color: var(--ink); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar-track { flex: 1 1 auto; height: 20px; background: #ededef; border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--action), var(--action-hover)); transition: width 0.4s var(--ease); }
+    .bar-count { flex: 0 0 44px; font-size: 13px; color: var(--muted); }
+    .bar-empty { font-size: 13px; color: var(--muted); margin: 8px 0; }
+
+    /* 本次读取范围面板 */
+    .read-scope {
+      border: 1px solid var(--line-soft);
+      border-radius: 18px;
+      padding: 16px 18px;
+      margin: 14px 0;
+      background: #fbfbfd;
+      box-shadow: var(--shadow-sm);
+    }
+    .read-scope .rs-title { font-weight: 650; font-size: 15px; margin-bottom: 8px; }
+    .read-scope .rs-version { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .read-scope .rs-sources { list-style: none; margin: 0 0 10px; padding: 0; }
+    .read-scope .rs-sources li { font-size: 14px; padding: 5px 0; display: flex; gap: 10px; align-items: baseline; }
+    .read-scope .rs-tool { font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace; font-size: 12px; color: var(--muted-2); }
+    .read-scope .rs-nodes { margin: 10px 0; }
+    .read-scope .rs-note { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line-soft); padding-top: 10px; margin-top: 10px; }
+    .read-scope .rs-group { margin: 10px 0 4px; }
+    .read-scope .rs-group-title { font-size: 12px; font-weight: 600; color: var(--muted); margin: 10px 0 6px; letter-spacing: 0.03em; }
+    .read-scope .rs-check { display: flex; gap: 8px; align-items: center; font-size: 14px; padding: 4px 0; cursor: pointer; }
+    .read-scope .rs-check input { accent-color: var(--action); width: 16px; height: 16px; flex: 0 0 auto; }
+    .read-scope .rs-check.rs-disabled { opacity: 0.5; cursor: not-allowed; }
+    .read-scope .rs-empty { font-size: 13px; color: var(--muted); padding: 2px 0; }
+    .read-scope .rs-hint { font-size: 12px; color: var(--muted); margin: 3px 0; }
+
+    /* ===== 章页画布：章泳道 + 页缩略图 + 连线 ===== */
+    .chapter-canvas { position: relative; margin-top: 16px; }
+    .chapter {
+      position: relative;
+      border-radius: 20px;
+      border: 1.5px solid #e2d6b6;
+      background: rgba(255, 254, 249, 0.62);
+      padding: 18px 18px 18px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s var(--ease);
+    }
+    .chapter.drag-over { border-color: var(--action); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.14); background: var(--soft); }
+    .chapter-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 18px; margin: -18px -18px 16px;
+      border-radius: 20px 20px 0 0;
+      background: linear-gradient(90deg, #0071e3, #49a1ff);
+      color: #fff;
+    }
+    .chapter-head .ch-no { font-size: 14px; font-weight: 600; opacity: 0.92; white-space: nowrap; }
+    .chapter-head .ch-name { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+    .chapter-head .ch-count { margin-left: auto; font-size: 14px; opacity: 0.92; white-space: nowrap; }
+    .chapter-pages { display: flex; flex-wrap: wrap; gap: 16px; min-height: 108px; align-items: stretch; }
+    .chapter-empty { font-size: 15px; color: var(--muted); align-self: center; margin: 0; }
+    .page-thumb {
+      position: relative;
+      width: 210px;
+      border-radius: 18px;
+      border: 1.5px solid var(--line);
+      background: #fff;
+      padding: 16px 18px;
+      cursor: grab;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease), opacity 0.15s var(--ease);
+      user-select: none;
+    }
+    .page-thumb a { color: inherit; text-decoration: none; display: block; }
+    .page-thumb:hover { border-color: var(--action); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .page-thumb:active { cursor: grabbing; }
+    .page-thumb.dragging { opacity: 0.35; }
+    .page-thumb .pt-grip { margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--line-soft); text-align: center; color: var(--muted-2); font-size: 12px; letter-spacing: 1px; cursor: grab; }
+    .drag-ghost { box-shadow: var(--shadow-lg); opacity: 0.92; transform: rotate(2deg); border-color: var(--action) !important; }
+    .page-thumb .pt-title { font-size: 17px; font-weight: 680; letter-spacing: -0.01em; }
+    .page-thumb .pt-meta { font-size: 13px; color: var(--muted); margin-top: 6px; }
+    .page-thumb .pt-status { position: absolute; top: 12px; right: 14px; font-size: 12px; color: var(--ok); font-weight: 600; }
+    .canvas-edges { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+    .canvas-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 13.5px; color: var(--muted); }
+    .canvas-legend .lg-item { display: inline-flex; align-items: center; gap: 6px; }
+    .canvas-legend .lg-line { display: inline-block; width: 26px; height: 0; border-top: 2.5px solid var(--action); border-radius: 2px; }
+
+    /* ===== 工作台左右分区：人的工作 / 智能体工作 ===== */
+    .work-split { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: start; }
+    .work-col { min-width: 0; }
+    .work-col > section.block { margin-top: 0; }
+    .work-col > section.block + section.block { margin-top: 34px; }
+    @media (max-width: 920px) { .work-split { grid-template-columns: 1fr; } }
+    .zone-banner {
+      display: flex; align-items: center; gap: 10px;
+      border-radius: 16px; padding: 13px 16px; margin-bottom: 14px;
+      font-size: 16px; font-weight: 700;
+    }
+    .zone-banner .zb-dot { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 auto; }
+    .zone-banner.human { background: #eef6f0; color: #0f5a3a; border: 1px solid #cde7d6; }
+    .zone-banner.human .zb-dot { background: #1a7f37; }
+    .zone-banner.agent { background: #eaf3fc; color: #0a4a8f; border: 1px solid #cfe3f8; }
+    .zone-banner.agent .zb-dot { background: #0071e3; }
+    .zone-banner .zb-sub { margin-left: auto; font-weight: 500; font-size: 13px; opacity: 0.8; }
+
+    /* ===== 中间交付物 ===== */
+    .deliverable-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+    .deliverable {
+      border-radius: 16px; border: 1.5px solid var(--line-soft);
+      background: #fff; padding: 14px 16px;
+      box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 5px;
+      transition: border-color 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+    }
+    .deliverable:hover { border-color: var(--action); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .deliverable a { color: inherit; text-decoration: none; display: flex; flex-direction: column; gap: 5px; }
+    .deliverable .dv-type { font-size: 12.5px; color: var(--muted); letter-spacing: 0.02em; }
+    .deliverable .dv-title { font-size: 16px; font-weight: 680; line-height: 1.35; }
+    .deliverable .dv-ver { font-size: 12.5px; color: var(--muted); }
+    .deliverable .dv-thumb { width: 100%; height: 84px; border-radius: 10px; background: var(--bg-deep); display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: var(--muted); letter-spacing: 0.05em; }
+
+    /* ===== 对话输入框 ===== */
+    .chat-box { margin: 14px 0 6px; transition: box-shadow 0.3s var(--ease); border-radius: 16px; }
+    .chat-box.pulse { box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.22); }
+    .chat-form { display: flex; gap: 10px; align-items: stretch; }
+    .chat-form input[type="text"] {
+      flex: 1 1 auto; width: auto; margin-bottom: 0;
+      font-size: 17px; padding: 15px 17px; border-radius: 16px;
+      border: 1.5px solid var(--line); background: #fff; color: var(--ink);
+    }
+    .chat-form input[type="text"]:focus { outline: none; border-color: var(--action); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.14); }
+    .chat-form .chat-send { flex: 0 0 auto; padding: 13px 28px; }
+    .chat-hint { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+
+    /* ===== 顶部导航 ===== */
+    nav.topnav { display: flex; align-items: center; gap: 10px; }
+    nav.topnav a {
+      font-size: 15px; color: var(--muted); text-decoration: none;
+      padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line);
+      background: var(--card); transition: all 0.15s var(--ease);
+    }
+    nav.topnav a:hover { color: var(--action); border-color: var(--action); }
+    nav.topnav a.active { color: #fff; background: var(--action); border-color: var(--action); }
+    .back-map {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 15px; font-weight: 600; color: var(--action); text-decoration: none;
+      padding: 9px 16px; border-radius: 999px; border: 1px solid var(--action);
+      background: var(--card); margin-bottom: 16px; transition: all 0.15s var(--ease);
+    }
+    .back-map:hover { background: var(--action); color: #fff; }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到内容</a>
+  <div class="wrap">
+    <header class="bar">
+      <a class="brand" href="/projects">思诺</a>
+      <nav class="topnav" id="topnav" aria-label="主导航"></nav>
+      <div id="account"></div>
+    </header>
+    <main id="main"></main>
+  </div>
+  <script>
+    const PAGE_STATUS = { active: "进行中", abandoned: "已放弃" };
+    const NODE_KIND_OPTIONS = [
+      ["problem", "问题", "clarification"],
+      ["evidence", "证据", "evidence"],
+      ["insight", "洞察", "evidence"],
+      ["requirement", "要求", "critic"],
+      ["artifact", "作品", "human"],
+      ["test", "测试", "human"],
+      ["decision", "决定", "human"],
+    ];
+
+    // 四类职责 + 人确认，配职责色
+    const ROLE_META = {
+      clarification: {
+        label: "课题澄清", dot: "#185fa5",
+        what: "界定课题边界，收敛成清晰的问题陈述",
+      },
+      evidence: {
+        label: "证据查找", dot: "#0f6e56",
+        what: "检索资料、提炼洞察，为每个要求找到依据",
+      },
+      method: {
+        label: "方法建议", dot: "#534ab7",
+        what: "推荐研究、验证与表达的方法",
+      },
+      critic: {
+        label: "过程检查", dot: "#854f0b",
+        what: "检查要求与缺口，给出下一步建议",
+      },
+      human: { label: "由人确认", dot: "#5f5e5a" },
+    };
+    // 七类节点 → 职责色
+    const NODE_DUTY = {
+      problem: "clarification",
+      evidence: "evidence",
+      insight: "evidence",
+      requirement: "critic",
+      artifact: "human",
+      test: "human",
+      decision: "human",
+    };
+    // 四类关系边（与后端 EDGE_KINDS 一致）
+    const EDGE_KIND_META = {
+      derives: { label: "承接", desc: "目标承接自源（源是它的依据）" },
+      supports: { label: "支持", desc: "源支持目标" },
+      refutes: { label: "反例", desc: "源与目标矛盾" },
+      cites: { label: "引用", desc: "源引用目标" },
+    };
+    const NODE_LABEL = {
+      problem: "问题", evidence: "证据", insight: "洞察",
+      requirement: "要求", artifact: "作品", test: "测试", decision: "决定",
+    };
+
+    // 各阶段（按 position 0–7）参与的职责与分工。
+    // 阶段名由 API 返回、可配置，此处不硬编码。
+    const STAGE_ROLES = [
+      [
+        { role: "clarification", note: "界定课题边界" },
+        { role: "evidence", note: "检索情境资料" },
+        { role: "critic", note: "判断是否推进" },
+      ],
+      [
+        { role: "evidence", note: "收集用户研究材料" },
+        { role: "method", note: "推荐访谈与观察方法" },
+      ],
+      [
+        { role: "clarification", note: "收敛问题陈述" },
+        { role: "evidence", note: "提炼洞察" },
+        { role: "critic", note: "检查问题陈述" },
+      ],
+      [
+        { role: "critic", note: "检查要求可测、有依据" },
+        { role: "evidence", note: "为要求找依据" },
+      ],
+      [
+        { role: "method", note: "发散概念" },
+        { role: "evidence", note: "检索参考案例" },
+      ],
+      [
+        { role: "method", note: "推荐原型与验证方法" },
+        { role: "evidence", note: "检索技术与制造依据" },
+      ],
+      [
+        { role: "method", note: "制定测试计划" },
+        { role: "critic", note: "检查测试结果与要求" },
+        { role: "evidence", note: "收集测试数据" },
+      ],
+      [
+        { role: "critic", note: "复盘遗漏项" },
+        { role: "method", note: "组织成果表达" },
+      ],
+    ];
+
+    let csrf = "";
+
+    // 本次运行的可勾选读集（白皮书 R11）。勾选只影响下一次 POST /agent-runs，
+    // 不回写权威事实。页面刷新后恢复为空（重新按当前页版本构建）。
+    const readSet = { pageVersionIds: [], artifactVersionIds: [], exclusions: [] };
+
+    // 四个快捷动作 → 后端意图词表（intent.py 冻结契约）
+    const QUICK_ACTIONS = [
+      { label: "澄清课题", intent: "简报变化", roles: ["clarification"], hint: "界定课题边界" },
+      { label: "找依据", intent: "查证据", roles: ["evidence"], hint: "检索资料，生成洞察" },
+      { label: "选方法", intent: "选方法", roles: ["method"], hint: "推荐合适的方法" },
+      { label: "检查下一步", intent: "下一步", roles: ["evidence", "critic"], hint: "检索证据，判断下一步" },
+    ];
+
+    // 工具名 → 中文（工具调用链可视化）
+    const TOOL_LABEL = {
+      search_evidence: "检索证据",
+      search_theory: "检索理论",
+      get_page_snapshot: "读取页快照",
+    };
+    const TOOL_STATUS_LABEL = {
+      hit: "命中",
+      empty: "无结果",
+      completed: "完成",
+    };
+
+    function el(tag, className) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      for (let index = 2; index < arguments.length; index += 1) {
+        const child = arguments[index];
+        if (child != null && child !== false) node.append(child);
+      }
+      return node;
+    }
+
+    function clear(node) {
+      while (node.firstChild) node.removeChild(node.firstChild);
+    }
+
+    function rolePill(role) {
+      const meta = ROLE_META[role] || { label: role, dot: "#888780" };
+      const pill = el("span", "pill role-" + role);
+      const dot = el("span", "", "●");
+      dot.style.color = meta.dot;
+      pill.append(dot, " ", meta.label);
+      return pill;
+    }
+
+    function explain(body, status) {
+      const error = body && body.error;
+      const category = error && error.details && error.details.category;
+      if (category === "csrf") return "这次提交已失效，请再提交一次。";
+      if (category === "origin") return "这个页面来源未被允许。";
+      const code = error && error.code;
+      if (code === "CANDIDATE_STALE" || code === "PREVIEW_CHANGED" || code === "PREVIEW_EXPIRED") {
+        return "这张卡依据的版本已更新，请重新检查。";
+      }
+      if (code === "CANDIDATE_ALREADY_RESOLVED") return "这张卡已处理。";
+      if (code === "HEAD_CHANGED") return "当前页已更新，请重新提交。";
+      if (status === 401) return "请先登录。";
+      if (status === 404) return "未找到，或你无权查看。";
+      if (status === 429) return "操作太频繁，请稍后再试。";
+      if (error && error.code === "INVALID_SCHEMA") return "没听懂这句话。试试这几种问法：检查下一步、查证据、问方法、简报变化。";
+      if (error && error.code === "IDEMPOTENCY_KEY_REUSED") return "这次提交与上次不一致，请修改后再提交。";
+      if (status === 0) return "无法连接服务。";
+      return "请重试。";
+    }
+
+    async function api(path, options) {
+      const headers = Object.assign({ Accept: "application/json" }, (options && options.headers) || {});
+      try {
+        const response = await fetch(path, {
+          method: (options && options.method) || "GET",
+          headers,
+          body: options && options.body,
+          credentials: "same-origin",
+        });
+        const text = await response.text();
+        let body = null;
+        if (text) {
+          try { body = JSON.parse(text); } catch (_error) { body = null; }
+        }
+        return {
+          ok: response.ok,
+          status: response.status,
+          data: body && body.data,
+          message: response.ok ? "" : explain(body, response.status),
+        };
+      } catch (_error) {
+        return { ok: false, status: 0, data: null, message: explain(null, 0) };
+      }
+    }
+
+    function route() {
+      const parts = location.pathname.split("/").filter(Boolean);
+      if (parts.length === 0 || (parts.length === 1 && parts[0] === "projects")) return { name: "shelf" };
+      if (parts.length === 2 && parts[0] === "projects") return { name: "stages", projectId: parts[1] };
+      if (parts.length === 4 && parts[0] === "projects" && parts[2] === "pages") {
+        return { name: "page", projectId: parts[1], pageId: parts[3] };
+      }
+      return { name: "missing" };
+    }
+
+    function statusWords(status) {
+      return PAGE_STATUS[status] || ("状态：" + status);
+    }
+
+    function alertBox(message) {
+      const box = el("p", "alert", message);
+      box.setAttribute("role", "alert");
+      return box;
+    }
+
+    function renderAccount(me) {
+      const slot = document.getElementById("account");
+      clear(slot);
+      if (!me) return;
+      const button = el("button", "quiet", "退出");
+      button.type = "button";
+      button.addEventListener("click", logout);
+      slot.append(el("span", "who", me.display_name || "已登录"), button);
+    }
+
+    function renderTopnav(here) {
+      const nav = document.getElementById("topnav");
+      if (!nav) return;
+      clear(nav);
+      const shelf = el("a", "", "项目书架");
+      shelf.href = "/projects";
+      if (here.name === "shelf") shelf.classList.add("active");
+      nav.append(shelf);
+      if (here.projectId) {
+        const map = el("a", "", "项目地图");
+        map.href = "/projects/" + encodeURIComponent(here.projectId);
+        if (here.name === "stages") map.classList.add("active");
+        nav.append(map);
+      }
+    }
+
+    async function logout() {
+      const result = await api("/api/v1/session", {
+        method: "DELETE",
+        headers: { "X-CSRF-Token": csrf },
+      });
+      if (!result.ok && result.status !== 401) {
+        const main = document.getElementById("main");
+        main.prepend(alertBox(result.message));
+        return;
+      }
+      location.href = "/";
+    }
+
+    function renderLogin() {
+      document.title = "登录 · 思诺";
+      renderAccount(null);
+      const main = document.getElementById("main");
+      clear(main);
+      const form = el("form", "panel");
+      const name = el("input");
+      name.id = "login-name";
+      name.type = "text";
+      name.name = "login_name";
+      name.autocomplete = "username";
+      name.required = true;
+      const password = el("input");
+      password.id = "login-password";
+      password.type = "password";
+      password.name = "password";
+      password.autocomplete = "current-password";
+      password.required = true;
+      const nameLabel = el("label", "", "登录名");
+      nameLabel.htmlFor = "login-name";
+      const passwordLabel = el("label", "", "密码");
+      passwordLabel.htmlFor = "login-password";
+      const submit = el("button", "", "登录");
+      submit.type = "submit";
+      form.append(
+        el("h1", "", "登录"),
+        el("p", "lead", "登录后进入你的项目空间。"),
+        nameLabel, name, passwordLabel, password, submit,
+      );
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        submit.disabled = true;
+        api("/api/v1/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ login_name: name.value, password: password.value }),
+        }).then(function (result) {
+          submit.disabled = false;
+          if (result.status === 401) {
+            form.prepend(alertBox("登录失败，请重试。"));
+            return;
+          }
+          if (!result.ok) {
+            form.prepend(alertBox(result.message));
+            return;
+          }
+          location.reload();
+        });
+      });
+      main.append(form);
+      name.focus();
+    }
+
+    function renderShelf(projects) {
+      document.title = "项目 · 思诺";
+      const main = document.getElementById("main");
+      clear(main);
+      main.append(
+        el("h1", "", "项目"),
+        el("p", "lead", "思诺让设计判断可解释、可回溯。四位智能体与你协作，查证、建议、检查，决定由你作。"),
+      );
+      main.append(roleCapabilities());
+      main.append(el("h2", "", "你的项目"), el("p", "meta", "选择一个项目，进入它的设计阶段。"));
+      if (!projects.length) {
+        main.append(el("p", "", "你的项目会出现在这里。"));
+      } else {
+        const list = el("div", "grid");
+        projects.forEach(function (project) {
+          const link = el("a", "project-link card", el("h2", "stage-name", project.title));
+          link.href = "/projects/" + encodeURIComponent(project.project_id);
+          list.append(link);
+        });
+        main.append(list);
+      }
+      main.append(el("h2", "", "新建项目"), createForm());
+    }
+
+    function roleCapabilities() {
+      const section = el("section", "block");
+      section.append(
+        el("h2", "", "智能体"),
+        el("p", "meta", "一次运行由至多三位智能体协作。"),
+      );
+      const grid = el("div", "capabilities");
+      ["clarification", "evidence", "method", "critic"].forEach(function (role) {
+        const meta = ROLE_META[role];
+        const card = el("div", "cap-card role-" + role);
+        const head = el("div", "cap-head");
+        const dot = el("span", "cap-dot");
+        dot.style.background = meta.dot;
+        head.append(dot, el("span", "cap-name", meta.label));
+        card.append(head);
+        card.append(el("p", "cap-what", meta.what));
+        grid.append(card);
+      });
+      section.append(grid);
+      return section;
+    }
+
+    function createForm() {
+      const form = el("form", "panel");
+      const title = el("input");
+      title.id = "project-title";
+      title.type = "text";
+      title.name = "title";
+      title.maxLength = 200;
+      title.required = true;
+      title.setAttribute("aria-describedby", "create-help");
+      const titleLabel = el("label", "", "课题名称");
+      titleLabel.htmlFor = "project-title";
+      const help = el("p", "meta", "建立后，项目会从第一个阶段开始。");
+      help.id = "create-help";
+      const submit = el("button", "", "建立项目");
+      submit.type = "submit";
+      form.append(titleLabel, title, help, submit);
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const stored = title.value.trim();
+        if (!stored) {
+          form.prepend(alertBox("请填写课题名称。"));
+          return;
+        }
+        if (!form.dataset.key) form.dataset.key = crypto.randomUUID();
+        submit.disabled = true;
+        api("/api/v1/projects", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrf,
+            "Idempotency-Key": form.dataset.key,
+          },
+          body: JSON.stringify({ title: stored }),
+        }).then(function (result) {
+          submit.disabled = false;
+          if (!result.ok) {
+            form.prepend(alertBox(result.message));
+            return;
+          }
+          location.assign("/projects/" + encodeURIComponent(result.data.project_id));
+        });
+      });
+      return form;
+    }
+
+    function renderStages(reading) {
+      document.title = reading.title + " · 思诺";
+      const main = document.getElementById("main");
+      clear(main);
+      const crumb = el("p", "path", el("a", "", "项目"));
+      crumb.firstChild.href = "/projects";
+      crumb.append(" / ", reading.title);
+      main.append(
+        crumb,
+        el("h1", "", reading.title),
+        el("p", "lead", "这是项目的「地图」：章是泳道，页是缩略图，蓝线是承接关系。点任意页缩略图进入工作台，在工作台里写节点、传交付物、与智能体对话。"),
+        el("p", "meta", "项目修订 " + reading.revision),
+      );
+
+      if (!reading.stages.length) {
+        main.append(el("p", "", "这个项目还没有阶段。"));
+        return;
+      }
+
+      // ① 设计流程条（8 阶段 workflow）
+      main.append(stageFlowbar(reading));
+      // ② 阶段覆盖度图表
+      main.append(stageCoverage(reading));
+      // ③ 章页画布：章泳道 + 页缩略图 + 承接连线（可拖拽重排）
+      main.append(chapterCanvas(reading));
+      // ④ 阶段 × 角色矩阵
+      main.append(stageRoleMatrix(reading));
+    }
+
+    function stageCoverage(reading) {
+      const block = el("section", "block");
+      block.append(
+        el("h2", "", "设计进度"),
+        el("p", "meta", "各阶段已开启的页数。"),
+      );
+      const chart = el("div", "bar-chart");
+      const maxPages = Math.max.apply(null, reading.stages.map(function (stage) { return stage.pages.length; }));
+      if (!maxPages) {
+        chart.append(el("p", "bar-empty", "从第一个阶段写问题、上传资料开始。"));
+      } else {
+        reading.stages.forEach(function (stage) {
+          const row = el("div", "bar-row");
+          const label = el("span", "bar-label", (stage.name || "未命名"));
+          label.title = stage.name;
+          const track = el("div", "bar-track");
+          const fill = el("div", "bar-fill");
+          fill.style.width = (stage.pages.length / maxPages * 100) + "%";
+          track.append(fill);
+          const count = el("span", "bar-count", stage.pages.length + " 页");
+          row.append(label, track, count);
+          chart.append(row);
+        });
+      }
+      block.append(chart);
+      return block;
+    }
+
+    function stageFlowbar(reading) {
+      const block = el("section", "block");
+      block.append(
+        el("h2", "", "设计流程"),
+        el("p", "meta", "按阶段推进。有内容的阶段会高亮。"),
+      );
+      const bar = el("div", "flowbar");
+      reading.stages.forEach(function (stage, index) {
+        if (index > 0) bar.append(el("span", "flow-arrow", "→"));
+        const node = el("div", "flow-node");
+        if (stage.pages.length) node.classList.add("has-pages");
+        node.append(
+          el("div", "flow-idx", "第 " + (stage.position + 1) + " 阶段"),
+          el("div", "flow-name", stage.name || "未命名"),
+          el("div", "flow-count", stage.pages.length ? (stage.pages.length + " 页") : "—"),
+        );
+        bar.append(node);
+      });
+      block.append(bar);
+      return block;
+    }
+
+    function stageRoleMatrix(reading) {
+      const block = el("section", "block");
+      block.append(
+        el("h2", "", "每个阶段的智能体"),
+        el("p", "meta", "课题澄清、证据查找、方法建议、过程检查，按阶段分工协作。"),
+      );
+      const wrap = el("div", "matrix");
+      const table = el("table");
+      const head = el("tr", "", el("th", "", "阶段"), el("th", "", "参与的职责"), el("th", "", "做什么"));
+      const thead = document.createElement("thead");
+      thead.append(head);
+      table.append(thead);
+      const tbody = document.createElement("tbody");
+      reading.stages.forEach(function (stage) {
+        const roles = STAGE_ROLES[stage.position] || [];
+        if (!roles.length) return;
+        const tr = el("tr");
+        tr.append(el("td", "", "第 " + (stage.position + 1) + " 阶段 · " + (stage.name || "未命名")));
+        const roleCell = el("td");
+        roles.forEach(function (agent) {
+          roleCell.append(rolePill(agent.role));
+        });
+        tr.append(roleCell);
+        const notes = el("td");
+        roles.forEach(function (agent) {
+          notes.append(el("div", "", ROLE_META[agent.role].label + "：" + agent.note));
+        });
+        tr.append(notes);
+        tbody.append(tr);
+      });
+      table.append(tbody);
+      wrap.append(table);
+      block.append(wrap);
+      return block;
+    }
+
+    // 章页画布：把「章」画成泳道，「页」画成可拖拽缩略图，用连线表达页间承接。
+    const EDGE_LABEL = { stage_source: "承接", branch: "分支", reference: "引用" };
+
+    function canvasLayoutKey(projectId) { return "sinuo-canvas-layout-" + projectId; }
+
+    function readCanvasLayout(projectId) {
+      try {
+        return JSON.parse(localStorage.getItem(canvasLayoutKey(projectId)) || "{}") || {};
+      } catch (_error) { return {}; }
+    }
+
+    function saveCanvasLayout(projectId, layout) {
+      try { localStorage.setItem(canvasLayoutKey(projectId), JSON.stringify(layout)); } catch (_error) { /* 忽略 */ }
+    }
+
+    function chapterCanvas(reading) {
+      const block = el("section", "block");
+      block.append(
+        el("h2", "", "项目地图"),
+        el("p", "meta", "书 → 章 → 页。同章页彼此平行；跨章箭头表示「由何而来、走向何处」。拖动页缩略图可重排布局（仅布局，不改阶段归属）。"),
+      );
+
+      const layout = readCanvasLayout(reading.project_id);
+      const pageById = {};
+      const defaultStage = {};
+      reading.stages.forEach(function (stage) {
+        (stage.pages || []).forEach(function (page) {
+          pageById[page.page_id] = page;
+          defaultStage[page.page_id] = stage.stage_id;
+        });
+      });
+      // 页的显示归属：优先本地布局，缺省用后端阶段
+      const placement = Object.assign({}, defaultStage, layout.placement || {});
+
+      const canvas = el("div", "chapter-canvas");
+      canvas.dataset.projectId = reading.project_id;
+
+      reading.stages.forEach(function (stage) {
+        // 收集显示在本章的页 id
+        const ids = (stage.pages || []).map(function (page) { return page.page_id; });
+        Object.keys(placement).forEach(function (pid) {
+          if (placement[pid] === stage.stage_id && ids.indexOf(pid) === -1) ids.push(pid);
+        });
+        const order = (layout.orders || {})[stage.stage_id];
+        if (order && order.length) {
+          ids.sort(function (a, b) {
+            const ia = order.indexOf(a);
+            const ib = order.indexOf(b);
+            if (ia === -1 && ib === -1) return 0;
+            if (ia === -1) return 1;
+            if (ib === -1) return -1;
+            return ia - ib;
+          });
+        }
+
+        const chapter = el("section", "chapter");
+        chapter.dataset.stageId = stage.stage_id;
+        const head = el("div", "chapter-head");
+        head.append(
+          el("span", "ch-no", "第 " + (stage.position + 1) + " 章"),
+          el("span", "ch-name", stage.name || "未命名阶段"),
+          el("span", "ch-count", ids.length + " 页"),
+        );
+        if (stage.has_hidden_pages) head.append(el("span", "ch-count", "· 有隐藏内容"));
+        chapter.append(head);
+
+        const pagesBox = el("div", "chapter-pages");
+        if (!ids.length) {
+          pagesBox.append(el("p", "chapter-empty", "这个阶段还没有页。"));
+        } else {
+          ids.forEach(function (pid) {
+            const page = pageById[pid];
+            if (page) pagesBox.append(pageThumb(page, reading.project_id));
+          });
+        }
+        chapter.append(pagesBox);
+        canvas.append(chapter);
+      });
+
+      block.append(canvas);
+      block.append(canvasLegend());
+      requestAnimationFrame(function () { drawCanvasEdges(canvas, reading); });
+      return block;
+    }
+
+    let dragState = null;
+
+    function pageThumb(page, projectId) {
+      const thumb = el("div", "page-thumb");
+      thumb.dataset.pageId = page.page_id;
+      const link = el("a", "", el("div", "pt-title", page.title || "未命名页"));
+      link.href = "/projects/" + encodeURIComponent(projectId) + "/pages/" + encodeURIComponent(page.page_id);
+      link.title = "进入这一页";
+      thumb.append(link);
+      thumb.append(el("div", "pt-meta", statusWords(page.status)));
+      const grip = el("div", "pt-grip", "⠿ 拖拽");
+      grip.title = "拖动以重排或移到其他章";
+      thumb.append(grip);
+      grip.addEventListener("pointerdown", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        beginDrag(event, thumb);
+      });
+      return thumb;
+    }
+
+    function beginDrag(event, thumb) {
+      const ghost = thumb.cloneNode(true);
+      ghost.classList.add("drag-ghost");
+      ghost.style.position = "fixed";
+      ghost.style.pointerEvents = "none";
+      ghost.style.zIndex = "9999";
+      ghost.style.width = thumb.offsetWidth + "px";
+      document.body.appendChild(ghost);
+      thumb.classList.add("dragging");
+      const rect = thumb.getBoundingClientRect();
+      dragState = {
+        thumb: thumb,
+        pageId: thumb.dataset.pageId,
+        ghost: ghost,
+        dx: event.clientX - rect.left,
+        dy: event.clientY - rect.top,
+      };
+      moveDragGhost(event);
+      document.addEventListener("pointermove", moveDragGhost);
+      document.addEventListener("pointerup", endDrag);
+    }
+
+    function moveDragGhost(event) {
+      if (!dragState) return;
+      dragState.ghost.style.left = (event.clientX - dragState.dx) + "px";
+      dragState.ghost.style.top = (event.clientY - dragState.dy) + "px";
+      document.querySelectorAll(".chapter.drag-over").forEach(function (node) { node.classList.remove("drag-over"); });
+      const hit = document.elementFromPoint(event.clientX, event.clientY);
+      const chapter = hit && hit.closest(".chapter");
+      if (chapter) chapter.classList.add("drag-over");
+    }
+
+    function endDrag(event) {
+      if (!dragState) return;
+      document.removeEventListener("pointermove", moveDragGhost);
+      document.removeEventListener("pointerup", endDrag);
+      const thumb = dragState.thumb;
+      dragState.ghost.remove();
+      dragState = null;
+      thumb.classList.remove("dragging");
+      document.querySelectorAll(".chapter.drag-over").forEach(function (node) { node.classList.remove("drag-over"); });
+      const hit = document.elementFromPoint(event.clientX, event.clientY);
+      const chapter = hit && hit.closest(".chapter");
+      const pagesBox = chapter && chapter.querySelector(".chapter-pages");
+      if (!pagesBox || !thumb) return;
+      const siblings = Array.prototype.slice.call(pagesBox.querySelectorAll(".page-thumb"));
+      let before = null;
+      siblings.forEach(function (node) {
+        if (node === thumb) return;
+        const rect = node.getBoundingClientRect();
+        if (!before && event.clientX < rect.left + rect.width / 2) before = node;
+      });
+      if (before) pagesBox.insertBefore(thumb, before);
+      else pagesBox.appendChild(thumb);
+      const empty = pagesBox.querySelector(".chapter-empty");
+      if (empty) empty.remove();
+      refreshChapterCounts(pagesBox.ownerDocument);
+      persistCanvasLayout(pagesBox.ownerDocument);
+    }
+
+    function refreshChapterCounts(documentRoot) {
+      documentRoot.querySelectorAll(".chapter").forEach(function (chapter) {
+        const count = chapter.querySelectorAll(".page-thumb").length;
+        const head = chapter.querySelector(".chapter-head");
+        if (!head) return;
+        const label = head.querySelector(".ch-count");
+        if (label) label.textContent = count + " 页";
+      });
+    }
+
+    function persistCanvasLayout(documentRoot) {
+      const canvas = documentRoot.querySelector(".chapter-canvas");
+      if (!canvas) return;
+      const placement = {};
+      const orders = {};
+      canvas.querySelectorAll(".chapter").forEach(function (chapter) {
+        const stageId = chapter.dataset.stageId;
+        const ids = Array.prototype.slice.call(chapter.querySelectorAll(".page-thumb")).map(function (node) { return node.dataset.pageId; });
+        orders[stageId] = ids;
+        ids.forEach(function (pid) { placement[pid] = stageId; });
+      });
+      saveCanvasLayout(canvas.dataset.projectId, { placement: placement, orders: orders });
+      const edgesJson = canvas.dataset.edges;
+      if (edgesJson) {
+        drawCanvasEdges(canvas, { edges: JSON.parse(edgesJson) });
+      }
+    }
+
+    function canvasLegend() {
+      const legend = el("div", "canvas-legend");
+      legend.append(
+        el("span", "lg-item", el("span", "lg-line", ""), " 跨章承接（来源 → 新页）"),
+        el("span", "lg-item", "同章页彼此平行，可拖动排序"),
+      );
+      return legend;
+    }
+
+    function drawCanvasEdges(canvas, reading) {
+      let svg = canvas.querySelector(".canvas-edges");
+      if (!svg) {
+        svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("class", "canvas-edges");
+        canvas.appendChild(svg);
+      }
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      const edges = reading.edges || [];
+      if (!edges.length) return;
+      // 记住 edges，供拖拽后重绘
+      canvas.dataset.edges = JSON.stringify(edges);
+
+      const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+      const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+      marker.setAttribute("id", "ah-canvas-edge");
+      marker.setAttribute("viewBox", "0 0 10 10");
+      marker.setAttribute("refX", "9"); marker.setAttribute("refY", "5");
+      marker.setAttribute("markerWidth", "7"); marker.setAttribute("markerHeight", "7");
+      marker.setAttribute("orient", "auto-start-reverse");
+      const mp = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      mp.setAttribute("d", "M0,0 L10,5 L0,10 z");
+      mp.setAttribute("fill", "#0071e3");
+      marker.appendChild(mp);
+      defs.appendChild(marker);
+      svg.appendChild(defs);
+
+      const canvasRect = canvas.getBoundingClientRect();
+      edges.forEach(function (edge) {
+        const src = canvas.querySelector('.page-thumb[data-page-id="' + edge.source_page_id + '"]');
+        const dst = canvas.querySelector('.page-thumb[data-page-id="' + edge.target_page_id + '"]');
+        if (!src || !dst) return;
+        const sr = src.getBoundingClientRect();
+        const dr = dst.getBoundingClientRect();
+        const x1 = sr.left - canvasRect.left + sr.width / 2;
+        const y1 = sr.top - canvasRect.top + sr.height;
+        const x2 = dr.left - canvasRect.left + dr.width / 2;
+        const y2 = dr.top - canvasRect.top;
+        const midY = (y1 + y2) / 2;
+        const d = "M" + x1 + " " + y1 + " C " + x1 + " " + midY + ", " + x2 + " " + midY + ", " + x2 + " " + y2;
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", d);
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "#0071e3");
+        path.setAttribute("stroke-width", "2");
+        path.setAttribute("stroke-dasharray", "6 4");
+        path.setAttribute("marker-end", "url(#ah-canvas-edge)");
+        svg.appendChild(path);
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", (x1 + x2) / 2);
+        label.setAttribute("y", midY - 7);
+        label.setAttribute("text-anchor", "middle");
+        label.setAttribute("font-size", "12");
+        label.setAttribute("font-weight", "600");
+        label.setAttribute("fill", "#0071e3");
+        label.textContent = EDGE_LABEL[edge.kind] || edge.kind;
+        svg.appendChild(label);
+      });
+    }
+
+    function renderPage(reading, stageName, projectTitle) {
+      document.title = reading.title + " · 思诺";
+      const main = document.getElementById("main");
+      clear(main);
+      const projects = el("a", "", "项目");
+      projects.href = "/projects";
+      const project = el("a", "", projectTitle);
+      project.href = "/projects/" + encodeURIComponent(reading.project_id);
+      const crumb = el("p", "path", projects, " / ", project, " / ", stageName, " / ", reading.title);
+      const back = el("a", "back-map", "← 查看项目地图（章 · 页 · 连线）");
+      back.href = "/projects/" + encodeURIComponent(reading.project_id);
+      back.title = "回到项目地图，查看章页画布与承接连线";
+      const place = el(
+        "p",
+        "lead",
+        "你在「" + stageName + "」的这一页。下面是这一页的推理图，节点颜色对应产出它的角色。",
+      );
+      main.append(back, crumb, el("h1", "", reading.title), place);
+      if (sessionStorage.getItem("sinuo-arrived") === reading.page_id) {
+        main.append(el("p", "alert", "确认之后到了这一页。"));
+        sessionStorage.removeItem("sinuo-arrived");
+      }
+      if (reading.head_version_no != null) {
+        main.append(el("span", "badge", "已确认第 " + reading.head_version_no + " 版"));
+      }
+      if (reading.draft) {
+        main.append(el("span", "badge", "进行中草稿 R" + reading.draft.content_revision));
+        main.append(el("p", "meta", "草稿与正式版本分开保存，确认后才成为正式版本。"));
+      } else {
+        main.append(el("p", "", "这一页还没有草稿。"));
+      }
+
+      main.append(pageNodeGraph(reading));
+
+      // 工作台左右分区：你的工作（左）/ 智能体工作（右）
+      const split = el("div", "work-split");
+      const humanCol = el("div", "work-col");
+      humanCol.append(
+        el("div", "zone-banner human", el("span", "zb-dot", ""), "你的工作", el("span", "zb-sub", "写节点 · 交付物 · 固化版本")),
+        writeNodeSection(reading),
+        worksSection(reading),
+      );
+      const agentCol = el("div", "work-col");
+      agentCol.append(
+        el("div", "zone-banner agent", el("span", "zb-dot", ""), "智能体工作", el("span", "zb-sub", "读取范围 · 提问 · 候选确认")),
+        askSection(reading),
+      );
+      split.append(humanCol, agentCol);
+      main.append(split);
+    }
+
+    function pageNodeGraph(reading) {
+      const block = el("section", "block");
+      block.append(
+        el("h2", "", "页内推理图"),
+        el("p", "meta", "节点按推理顺序排成链条；按住节点右侧的 ↗ 把手拖到另一个节点，即可连一条关系边（承接 / 支持 / 反例 / 引用）。点击节点可编辑内容。"),
+      );
+      const legend = el("div", "legend");
+      Object.keys(ROLE_META).forEach(function (role) {
+        legend.append(rolePill(role));
+      });
+      block.append(legend);
+      if (!reading.nodes_readable) {
+        block.append(el("p", "alert", "这一页的节点暂时无法显示。"));
+        return block;
+      }
+      if (!reading.nodes.length) {
+        block.append(el("p", "", reading.draft ? "从问题、资料开始。" : "这一页还没有内容。"));
+        return block;
+      }
+      // 按推理顺序排序：问题 → 证据 → 洞察 → 要求 → 作品 → 测试 → 决定
+      const kindOrder = { problem: 0, evidence: 1, insight: 2, requirement: 3, artifact: 4, test: 5, decision: 6 };
+      const ordered = reading.nodes.slice().sort(function (a, b) {
+        const ia = kindOrder[a.kind] != null ? kindOrder[a.kind] : 99;
+        const ib = kindOrder[b.kind] != null ? kindOrder[b.kind] : 99;
+        return ia - ib;
+      });
+      const labelOf = {};
+      ordered.forEach(function (n) { labelOf[n.node_id] = n.label || NODE_LABEL[n.kind] || "节点"; });
+      const edges = reading.edges || [];
+      const graph = el("div", "node-graph");
+      ordered.forEach(function (node) {
+        const duty = node.duty || NODE_DUTY[node.kind] || "human";
+        const chain = el("div", "node-chain");
+        const dot = el("span", "n-dot");
+        dot.style.background = (ROLE_META[duty] || {}).dot || "#888";
+        const chip = el("div", "node-chip role-" + duty);
+        chip.dataset.nodeId = node.node_id;
+        const head = el("div", "n-head");
+        head.append(
+          el("span", "n-kind", node.label || NODE_LABEL[node.kind] || "节点"),
+          el("span", "n-duty", (node.duty_label || ROLE_META[duty].label || duty)),
+        );
+        const content = el("div", "n-content" + (node.content ? "" : " empty"), node.content || "（尚未填写内容，点击编辑）");
+        const foot = el("div", "n-foot", el("span", "", node.record_label || ("状态：" + (node.record || "—"))));
+        if (node.artifact_version_id) {
+          foot.append(el("span", "", "引用作品 " + node.artifact_version_id.slice(0, 12) + "…"));
+        }
+        chip.append(head, content, foot);
+        // 出边标签（本节点作为来源的关系边）
+        const outEdges = edges.filter(function (e) { return e.source_node_id === node.node_id; });
+        if (outEdges.length) {
+          const edgeBox = el("div", "n-edges");
+          edgeBox.append(el("span", "ne-caption", "承接关系"));
+          outEdges.forEach(function (e) {
+            const kind = EDGE_KIND_META[e.kind] ? e.kind : "derives";
+            const tag = el("span", "n-edge-tag");
+            tag.append(el("span", "ne-kind", EDGE_KIND_META[kind].label));
+            tag.append(el("span", "ne-arrow", "→"));
+            tag.append(el("span", "ne-target", labelOf[e.target_node_id] || "节点"));
+            const del = el("span", "ne-del", "×");
+            del.title = "删除这条关系";
+            del.addEventListener("click", function (ev) {
+              ev.stopPropagation();
+              ev.preventDefault();
+              removeEdge(reading, e.edge_id);
+            });
+            tag.append(del);
+            edgeBox.append(tag);
+          });
+          chip.append(edgeBox);
+        }
+        chip.title = "点击编辑这个节点";
+        chip.addEventListener("click", function () { openNodeEditor(reading, node, chip); });
+        // 连线把手
+        const anchor = el("span", "n-link-anchor", "↗");
+        anchor.title = "拖到另一个节点，连一条关系边";
+        attachLinkAnchor(reading, anchor, node.node_id, labelOf);
+        chip.append(anchor);
+        chain.append(dot, chip);
+        graph.append(chain);
+      });
+      block.append(graph);
+      return block;
+    }
+
+    // 拖拽连线：从源节点的把手拖到目标节点，松开后选择关系类型。
+    function attachLinkAnchor(reading, anchor, sourceId, labelOf) {
+      anchor.addEventListener("pointerdown", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!reading.draft) {
+          alert("先记下节点内容，再连关系。");
+          return;
+        }
+        anchor.setPointerCapture(event.pointerId);
+        anchor.classList.add("link-active");
+        document.querySelectorAll(".node-chip").forEach(function (c) {
+          if (c.dataset.nodeId !== sourceId) c.classList.add("link-target");
+        });
+        const up = function (ev) {
+          anchor.classList.remove("link-active");
+          document.querySelectorAll(".node-chip.link-target").forEach(function (c) { c.classList.remove("link-target"); });
+          anchor.removeEventListener("pointerup", up);
+          anchor.removeEventListener("pointercancel", up);
+          const under = document.elementFromPoint(ev.clientX, ev.clientY);
+          const targetChip = under && under.closest ? under.closest(".node-chip") : null;
+          if (targetChip && targetChip.dataset.nodeId && targetChip.dataset.nodeId !== sourceId) {
+            pickEdgeKind(reading, sourceId, targetChip.dataset.nodeId, labelOf);
+          }
+        };
+        anchor.addEventListener("pointerup", up);
+        anchor.addEventListener("pointercancel", up);
+      });
+    }
+
+    // 关系类型选择弹层。
+    function pickEdgeKind(reading, sourceId, targetId, labelOf) {
+      const overlay = el("div", "kind-picker");
+      const panel = el("div", "kp-panel");
+      panel.append(el("div", "kp-title", "连一条关系边"));
+      panel.append(el("div", "kp-sub", "从「" + (labelOf[sourceId] || "节点") + "」到「" + (labelOf[targetId] || "节点") + "」，选一种关系："));
+      const opts = el("div", "kp-options");
+      Object.keys(EDGE_KIND_META).forEach(function (kind) {
+        const opt = el("div", "kp-option");
+        opt.append(
+          el("div", "ko-kind", EDGE_KIND_META[kind].label),
+          el("div", "ko-desc", EDGE_KIND_META[kind].desc),
+        );
+        opt.addEventListener("click", function () {
+          overlay.remove();
+          addEdge(reading, sourceId, targetId, kind);
+        });
+        opts.append(opt);
+      });
+      const cancel = el("button", "quiet kp-cancel", "取消");
+      cancel.type = "button";
+      cancel.addEventListener("click", function () { overlay.remove(); });
+      panel.append(opts, cancel);
+      overlay.append(panel);
+      overlay.addEventListener("click", function (event) { if (event.target === overlay) overlay.remove(); });
+      document.body.appendChild(overlay);
+    }
+
+    async function addEdge(reading, sourceId, targetId, kind) {
+      if (!reading.draft) return;
+      const content = nodeDraftPayload(reading, function (node) {
+        const out = { node_id: node.node_id, kind: node.kind, duty: node.duty, record: node.record };
+        if (node.content) out.content = node.content;
+        if (node.artifact_version_id) out.artifact_version_id = node.artifact_version_id;
+        return out;
+      });
+      content.edges.push({ edge_id: crypto.randomUUID(), source_node_id: sourceId, target_node_id: targetId, kind: kind });
+      const ok = await patchDraft(reading, content, null);
+      if (!ok) alert("这条关系没有保存成功，请重试。");
+    }
+
+    async function removeEdge(reading, edgeId) {
+      if (!reading.draft) return;
+      const content = nodeDraftPayload(reading, function (node) {
+        const out = { node_id: node.node_id, kind: node.kind, duty: node.duty, record: node.record };
+        if (node.content) out.content = node.content;
+        if (node.artifact_version_id) out.artifact_version_id = node.artifact_version_id;
+        return out;
+      });
+      content.edges = content.edges.filter(function (e) { return e.edge_id !== edgeId; });
+      const ok = await patchDraft(reading, content, null);
+      if (!ok) alert("这条关系没有删除成功，请重试。");
+    }
+
+    function writeNodeSection(reading) {
+      const slot = el("section", "block");
+      slot.append(
+        el("h2", "", "写节点"),
+        el("p", "lead", "选类型、写下内容，记下这个节点。"),
+      );
+      const form = el("form", "panel");
+      const select = el("select");
+      select.id = "node-kind";
+      NODE_KIND_OPTIONS.forEach(function (pair) {
+        const option = document.createElement("option");
+        option.value = pair[0];
+        option.textContent = pair[1];
+        select.append(option);
+      });
+      const label = el("label", "", "节点类型");
+      label.htmlFor = "node-kind";
+      const content = document.createElement("textarea");
+      content.id = "node-content";
+      content.placeholder = "写下这个节点的内容，例如：用户夜间取物时需要少移动其他物品";
+      content.maxLength = 2000;
+      const contentLabel = el("label", "", "内容");
+      contentLabel.htmlFor = "node-content";
+      const submit = el("button", "", "记下这个节点");
+      submit.type = "submit";
+      form.append(label, select, contentLabel, content, submit);
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        addNode(reading, select.value, content.value, submit, form);
+      });
+      slot.append(form);
+      slot.append(checkpointSection(reading));
+      return slot;
+    }
+
+    function checkpointSection(reading) {
+      const box = el("div", "panel");
+      box.append(el("strong", "", "确认这一版"));
+      const note = el("p", "meta", "");
+      note.textContent = reading.draft
+        ? ("把草稿 R" + reading.draft.content_revision + " 确认为这一页的正式版本，后续的新页会从这里展开。")
+        : "先记下内容，再确认这一版。";
+      box.append(note);
+      const button = el("button", "", "确认为正式版本");
+      button.type = "button";
+      button.disabled = !reading.draft || !reading.head_version_id;
+      button.addEventListener("click", function () { checkpointPage(reading, button, box); });
+      box.append(button);
+      return box;
+    }
+
+    async function checkpointPage(reading, button, box) {
+      if (!reading.draft || !reading.head_version_id) return;
+      button.disabled = true;
+      const result = await api("/api/v1/pages/" + encodeURIComponent(reading.page_id) + "/checkpoints", {
+        method: "POST",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify({
+          expected_head_version_id: reading.head_version_id,
+          expected_content_revision: reading.draft.content_revision,
+          expected_content_hash: reading.draft.content_hash,
+        }),
+      });
+      button.disabled = false;
+      if (!result.ok) {
+        box.prepend(alertBox(result.message));
+        return;
+      }
+      location.reload();
+    }
+
+    async function addNode(reading, kind, contentText, submit, form) {
+      const base = reading.draft;
+      if (!base) {
+        form.prepend(alertBox("这一页还没有草稿，先记下内容再写节点。"));
+        return;
+      }
+      if (!contentText.trim()) {
+        form.prepend(alertBox("请写下这个节点的内容。"));
+        return;
+      }
+      const duty = NODE_KIND_OPTIONS.find(function (pair) { return pair[0] === kind; })[2];
+      const nodes = [];
+      reading.nodes.forEach(function (node) {
+        if (!node.kind) return;
+        const out = { node_id: node.node_id, kind: node.kind, duty: node.duty, record: node.record };
+        if (node.content) out.content = node.content;
+        if (node.artifact_version_id) out.artifact_version_id = node.artifact_version_id;
+        nodes.push(out);
+      });
+      nodes.push({ node_id: crypto.randomUUID(), kind: kind, duty: duty, record: "formal", content: contentText.trim() });
+      const edges = (reading.edges || []).map(function (edge) {
+        return { edge_id: edge.edge_id || crypto.randomUUID(), source_node_id: edge.source_node_id, target_node_id: edge.target_node_id };
+      });
+      const document = { schema_version: 1, nodes: nodes, edges: edges };
+      submit.disabled = true;
+      const result = await api("/api/v1/pages/" + encodeURIComponent(reading.page_id) + "/draft", {
+        method: "PATCH",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify({
+          base_version_id: base.base_version_id,
+          expected_revision: base.content_revision,
+          content: document,
+        }),
+      });
+      submit.disabled = false;
+      if (!result.ok) {
+        form.prepend(alertBox(result.message));
+        return;
+      }
+      location.reload();
+    }
+
+    function writeHeaders(key) {
+      return {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrf,
+        "Idempotency-Key": key,
+      };
+    }
+
+    // 节点编辑弹层：改内容 / 删除
+    function openNodeEditor(reading, node, chip) {
+      if (!reading.draft) return;
+      const overlay = el("div", "node-editor");
+      const panel = el("div", "ne-panel");
+      const title = el("div", "ne-title", (node.label || NODE_LABEL[node.kind] || "节点") + " · 编辑");
+      const meta = el("div", "ne-meta", (node.duty_label || "") + (node.record_label ? " · " + node.record_label : ""));
+      const textarea = document.createElement("textarea");
+      textarea.value = node.content || "";
+      textarea.placeholder = "写下这个节点的内容";
+      textarea.maxLength = 2000;
+      const actions = el("div", "ne-actions");
+      const cancel = el("button", "quiet", "取消");
+      cancel.type = "button";
+      const ask = el("button", "quiet ne-ask", "问智能体");
+      ask.type = "button";
+      ask.title = "围绕这个节点向智能体提问（会带入本页全部节点）";
+      const save = el("button", "", "保存");
+      save.type = "button";
+      const del = el("button", "quiet ne-del", "删除");
+      del.type = "button";
+      actions.append(cancel, ask, del, save);
+      panel.append(title, meta, textarea, actions);
+      overlay.append(panel);
+      cancel.addEventListener("click", function () { overlay.remove(); });
+      overlay.addEventListener("click", function (event) { if (event.target === overlay) overlay.remove(); });
+      ask.addEventListener("click", function () {
+        overlay.remove();
+        focusChatForNode(node);
+      });
+      save.addEventListener("click", async function () {
+        save.disabled = true;
+        const done = await updateNodeContent(reading, node.node_id, textarea.value, overlay);
+        save.disabled = false;
+        if (done) overlay.remove();
+      });
+      del.addEventListener("click", async function () {
+        del.disabled = true;
+        const done = await deleteNode(reading, node.node_id, overlay);
+        del.disabled = false;
+        if (done) overlay.remove();
+      });
+      document.body.appendChild(overlay);
+      textarea.focus();
+    }
+
+    // 从节点弹层跳转到对话输入框，并把节点作为上下文预填进去。
+    function focusChatForNode(node) {
+      const input = document.getElementById("chat-input");
+      if (!input) return;
+      const label = node.label || NODE_LABEL[node.kind] || "节点";
+      const snippet = (node.content || "").replace(/\s+/g, " ").slice(0, 28);
+      input.value = "查证据：" + label + (snippet ? "「" + snippet + "…」" : "");
+      input.focus();
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      const box = input.closest(".chat-box");
+      if (box) {
+        box.classList.add("pulse");
+        setTimeout(function () { box.classList.remove("pulse"); }, 1400);
+      }
+    }
+
+    function nodeDraftPayload(reading, mutator) {
+      const nodes = reading.nodes
+        .filter(function (node) { return node.kind; })
+        .map(function (node) {
+          const out = mutator(node);
+          return out;
+        })
+        .filter(Boolean);
+      const edges = (reading.edges || []).map(function (edge) {
+        const out = { edge_id: edge.edge_id || crypto.randomUUID(), source_node_id: edge.source_node_id, target_node_id: edge.target_node_id };
+        if (edge.kind) out.kind = edge.kind;
+        return out;
+      });
+      return { schema_version: 1, nodes: nodes, edges: edges };
+    }
+
+    async function patchDraft(reading, content, overlay) {
+      const base = reading.draft;
+      const result = await api("/api/v1/pages/" + encodeURIComponent(reading.page_id) + "/draft", {
+        method: "PATCH",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify({
+          base_version_id: base.base_version_id,
+          expected_revision: base.content_revision,
+          content: content,
+        }),
+      });
+      if (!result.ok) {
+        if (overlay) overlay.prepend(alertBox(result.message));
+        return false;
+      }
+      location.reload();
+      return true;
+    }
+
+    async function updateNodeContent(reading, nodeId, contentText, overlay) {
+      const content = nodeDraftPayload(reading, function (node) {
+        const out = { node_id: node.node_id, kind: node.kind, duty: node.duty, record: node.record };
+        const text = node.node_id === nodeId ? contentText.trim() : node.content;
+        if (text) out.content = text;
+        if (node.artifact_version_id) out.artifact_version_id = node.artifact_version_id;
+        return out;
+      });
+      return await patchDraft(reading, content, overlay);
+    }
+
+    async function deleteNode(reading, nodeId, overlay) {
+      const content = nodeDraftPayload(reading, function (node) {
+        if (node.node_id === nodeId) return null;
+        const out = { node_id: node.node_id, kind: node.kind, duty: node.duty, record: node.record };
+        if (node.content) out.content = node.content;
+        if (node.artifact_version_id) out.artifact_version_id = node.artifact_version_id;
+        return out;
+      });
+      return await patchDraft(reading, content, overlay);
+    }
+
+    async function sha256(buffer) {
+      const digest = await crypto.subtle.digest("SHA-256", buffer);
+      return Array.from(new Uint8Array(digest)).map(function (byte) {
+        return byte.toString(16).padStart(2, "0");
+      }).join("");
+    }
+
+    function worksSection(reading) {
+      const slot = el("section", "block");
+      slot.append(
+        el("h2", "", "中间交付物"),
+        el("p", "lead", "草图、模型、测试记录等作品按版本沉淀在这里，之后可作为证据被锚定引用。"),
+      );
+      const list = el("div", "deliverable-grid");
+      slot.append(list, uploadForm(reading, list));
+      refreshArtifacts(reading.project_id, list);
+      return slot;
+    }
+
+    function mediaLabel(mediaType) {
+      const t = (mediaType || "").toLowerCase();
+      if (t.indexOf("image") === 0) return "图像";
+      if (t.indexOf("video") === 0) return "视频";
+      if (t.indexOf("model") === 0 || t.indexOf("glb") >= 0 || t.indexOf("gltf") >= 0) return "模型";
+      if (t.indexOf("pdf") >= 0 || t.indexOf("doc") >= 0) return "文档";
+      if (t.indexOf("cad") >= 0 || t.indexOf("step") >= 0 || t.indexOf("stl") >= 0 || t.indexOf("iges") >= 0) return "工程";
+      if (t.indexOf("text") === 0) return "文本";
+      return "文件";
+    }
+
+    async function refreshArtifacts(projectId, list) {
+      const result = await api("/api/v1/projects/" + encodeURIComponent(projectId) + "/artifacts");
+      clear(list);
+      if (!result.ok) {
+        list.append(alertBox(result.message));
+        return;
+      }
+      if (!result.data.artifacts.length) list.append(el("p", "", "交付物会出现在这里。"));
+      result.data.artifacts.forEach(function (item) {
+        const card = el("article", "deliverable");
+        const link = el("a");
+        link.href = "/api/v1/artifact-versions/" + encodeURIComponent(item.artifact_version_id) + "/content";
+        link.title = item.title;
+        link.append(
+          el("span", "dv-thumb", mediaLabel(item.media_type)),
+          el("span", "dv-title", item.title),
+          el("span", "dv-ver", "第 " + item.version_no + " 版"),
+        );
+        card.append(link);
+        list.append(card);
+      });
+      if (result.data.has_hidden_artifacts) list.append(el("p", "", "有不可见内容"));
+    }
+
+    function uploadForm(reading, list) {
+      const form = el("form", "panel");
+      const file = el("input");
+      file.type = "file";
+      file.id = "work-file";
+      const license = el("input");
+      license.type = "text";
+      license.id = "work-license";
+      license.maxLength = 200;
+      const sensitivity = document.createElement("select");
+      sensitivity.id = "work-sensitivity";
+      [["project", "项目内"], ["sensitive", "敏感"], ["released", "可对外"]].forEach(function (pair) {
+        const option = document.createElement("option");
+        option.value = pair[0];
+        option.textContent = pair[1];
+        sensitivity.append(option);
+      });
+      const allow = el("input");
+      allow.type = "checkbox";
+      allow.id = "work-ai";
+      const fileLabel = el("label", "", "选择文件");
+      fileLabel.htmlFor = "work-file";
+      const licenseLabel = el("label", "", "许可");
+      licenseLabel.htmlFor = "work-license";
+      const senseLabel = el("label", "", "敏感范围");
+      senseLabel.htmlFor = "work-sensitivity";
+      const allowLabel = el("label", "", "允许以后的运行读取这份原件");
+      allowLabel.htmlFor = "work-ai";
+      const submit = el("button", "", "上传原件");
+      submit.type = "submit";
+      form.append(
+        fileLabel, file, licenseLabel, license, senseLabel, sensitivity,
+        allow, allowLabel,
+        el("p", "meta", "勾选后，后续运行可以读取这份原件。"),
+        submit,
+      );
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        uploadWork(form, reading.project_id, file, license, sensitivity, allow, submit, list);
+      });
+      return form;
+    }
+
+    async function uploadWork(form, projectId, fileInput, licenseInput, sensitivity, allow, submit, list) {
+      const file = fileInput.files && fileInput.files[0];
+      const license = licenseInput.value.trim();
+      if (!file) {
+        form.prepend(alertBox("请选择文件。"));
+        return;
+      }
+      if (!license) {
+        form.prepend(alertBox("请填写许可。"));
+        return;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        form.prepend(alertBox("文件超过 8 MB，请换一个较小的文件。"));
+        return;
+      }
+      submit.disabled = true;
+      const bytes = await file.arrayBuffer();
+      const digest = await sha256(bytes);
+      const opened = await api("/api/v1/projects/" + encodeURIComponent(projectId) + "/artifacts/uploads", {
+        method: "POST",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify({
+          name: file.name,
+          media_type: file.type || "application/octet-stream",
+          size: file.size,
+          declared_hash: digest,
+          license: license,
+          sensitivity: sensitivity.value,
+          ai_processing_allowed: allow.checked ? 1 : 0,
+        }),
+      });
+      if (!opened.ok) {
+        submit.disabled = false;
+        form.prepend(alertBox(opened.message));
+        return;
+      }
+      const ticket = opened.data.ticket_id;
+      const staged = await api("/api/v1/uploads/" + encodeURIComponent(ticket) + "/content", {
+        method: "PUT",
+        headers: {
+          "X-CSRF-Token": csrf,
+          "Idempotency-Key": crypto.randomUUID(),
+          "Content-Type": "application/octet-stream",
+        },
+        body: bytes,
+      });
+      if (!staged.ok) {
+        submit.disabled = false;
+        form.prepend(alertBox(staged.message));
+        return;
+      }
+      const done = await api("/api/v1/uploads/" + encodeURIComponent(ticket) + "/complete", {
+        method: "POST",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify({ declared_hash: digest }),
+      });
+      submit.disabled = false;
+      if (!done.ok) {
+        form.prepend(alertBox(done.message));
+        return;
+      }
+      const saved = done.data.preview_generated ? "原件已保存。" : "原件已保存，预览稍后可用。";
+      form.prepend(alertBox(saved + "第 " + done.data.version_no + " 版。"));
+      refreshArtifacts(projectId, list);
+    }
+
+    function askSection(reading) {
+      const slot = el("section", "block");
+      const runSlot = el("div");
+      const cardSlot = el("div");
+      slot.append(
+        el("h2", "", "智能体工作台"),
+        el("p", "lead", "在下面输入你的问题，或点快捷动作。智能体各自分工查证、建议、检查，结论交由你确认。"),
+        chatBox(reading, runSlot, cardSlot),
+        readScopePanel(reading),
+        intentRules(),
+        quickActions(reading, runSlot, cardSlot),
+        runSlot,
+        cardSlot,
+      );
+      loadCandidates(cardSlot, reading);
+      return slot;
+    }
+
+    // 自由对话输入框：输入一句话，直接问智能体。
+    function chatBox(reading, runSlot, cardSlot) {
+      const box = el("div", "chat-box");
+      const form = el("form", "chat-form");
+      const input = el("input");
+      input.type = "text";
+      input.name = "chat";
+      input.id = "chat-input";
+      input.placeholder = "例如：检查下一步 · 查证据 · 问方法 · 简报变化";
+      input.autocomplete = "off";
+      const send = el("button", "chat-send", "发送");
+      send.type = "submit";
+      form.append(input, send);
+      const hint = el("p", "chat-hint", "可输入：检查下一步、查证据、问方法、简报变化，回车或点「发送」。");
+      box.append(form, hint);
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+        if (!reading.head_version_id) {
+          form.prepend(alertBox("先确认这一版，再提问。"));
+          return;
+        }
+        send.disabled = true;
+        send.textContent = "发送中…";
+        await askNext(send, reading, runSlot, cardSlot, text, text);
+        send.disabled = false;
+        send.textContent = "发送";
+        input.value = "";
+      });
+      return box;
+    }
+
+    // 本次读取范围：可勾选。读集候选来自 GET /context-scope，勾选只影响下一次运行。
+    function readScopePanel(reading) {
+      const panel = el("div", "read-scope");
+      panel.append(el("div", "rs-title", "本次读取范围"));
+      const version = [];
+      if (reading.head_version_no != null) version.push("已确认第 " + reading.head_version_no + " 版");
+      if (reading.draft) version.push("草稿 R" + reading.draft.content_revision);
+      panel.append(el("div", "rs-version", version.length ? ("当前页：" + version.join(" · ")) : "当前页还没有正式版本。"));
+      const sources = el("ul", "rs-sources");
+      const reads = [
+        { tool: "get_page_snapshot", label: "本页内容" },
+        { tool: "search_evidence", label: "项目内的证据" },
+        { tool: "search_theory", label: "理论库" },
+        { tool: "lookup_method", label: "方法卡" },
+      ];
+      reads.forEach(function (item) {
+        sources.append(
+          el("li", "", el("span", "rs-tool", item.tool), el("span", "", item.label)),
+        );
+      });
+      panel.append(sources);
+      panel.append(exclusionChecks());
+      const scopeBox = el("div");
+      panel.append(scopeBox);
+      loadScopeOptions(scopeBox, reading);
+      const nodes = reading.nodes || [];
+      if (nodes.length) {
+        const counts = {};
+        nodes.forEach(function (node) {
+          const duty = node.duty || NODE_DUTY[node.kind] || "human";
+          counts[duty] = (counts[duty] || 0) + 1;
+        });
+        const box = el("div", "rs-nodes");
+        box.append(el("strong", "", "本页内容："));
+        const pills = el("div", "legend");
+        Object.keys(counts).forEach(function (duty) {
+          pills.append(rolePill(duty));
+          pills.append(el("span", "meta", "×" + counts[duty] + " "));
+        });
+        box.append(pills);
+        panel.append(box);
+      }
+      panel.append(
+        el("div", "rs-note", "勾选将用于下一次检查：纳入邻页或作品，或跳过理论库与方法卡。"),
+      );
+      return panel;
+    }
+
+    // 排除项：本次跳过理论库 / 方法卡库（T13a exclusions）。
+    function exclusionChecks() {
+      const group = el("div", "rs-group");
+      group.append(el("div", "rs-group-title", "本次跳过"));
+      [["theory", "理论库"], ["methods", "方法卡"]].forEach(function (pair) {
+        group.append(
+          checkRow(pair[1], readSet.exclusions.indexOf(pair[0]) !== -1, function (checked) {
+            if (checked) {
+              if (readSet.exclusions.indexOf(pair[0]) === -1) readSet.exclusions.push(pair[0]);
+            } else {
+              readSet.exclusions = readSet.exclusions.filter(function (key) { return key !== pair[0]; });
+            }
+          }),
+        );
+      });
+      return group;
+    }
+
+    // 一个可勾选行。
+    function checkRow(label, checked, onChange) {
+      const checkbox = el("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = checked;
+      checkbox.addEventListener("change", function () { onChange(checkbox.checked); });
+      const row = el("label", "rs-check");
+      row.append(checkbox, el("span", "", label));
+      return row;
+    }
+
+    // 拉读集候选，渲染邻页版本 / 作品版本，证据锚点与方法卡作说明。
+    async function loadScopeOptions(scopeBox, reading) {
+      const result = await api("/api/v1/projects/" + encodeURIComponent(reading.project_id) + "/context-scope");
+      if (!result.ok) {
+        scopeBox.append(el("p", "rs-empty", "读取范围暂不可用（" + result.message + "）。"));
+        return;
+      }
+      const scope = result.data || {};
+      const adjacent = (scope.page_versions || []).filter(function (pv) {
+        return pv.page_version_id !== reading.head_version_id;
+      });
+      if (adjacent.length) {
+        const group = el("div", "rs-group");
+        group.append(el("div", "rs-group-title", "纳入邻页"));
+        adjacent.forEach(function (pv) {
+          group.append(
+            checkRow(pv.title + " · 第 " + pv.version_no + " 版", readSet.pageVersionIds.indexOf(pv.page_version_id) !== -1, function (checked) {
+              if (checked) {
+                if (readSet.pageVersionIds.indexOf(pv.page_version_id) === -1) readSet.pageVersionIds.push(pv.page_version_id);
+              } else {
+                readSet.pageVersionIds = readSet.pageVersionIds.filter(function (id) { return id !== pv.page_version_id; });
+              }
+            }),
+          );
+        });
+        scopeBox.append(group);
+      }
+      const artifacts = scope.artifact_versions || [];
+      if (artifacts.length) {
+        const group = el("div", "rs-group");
+        group.append(el("div", "rs-group-title", "纳入作品"));
+        artifacts.forEach(function (av) {
+          const row = el("label", "rs-check");
+          const checkbox = el("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = readSet.artifactVersionIds.indexOf(av.artifact_version_id) !== -1;
+          if (!av.ai_processing_allowed) {
+            checkbox.disabled = true;
+            row.classList.add("rs-disabled");
+          } else {
+            checkbox.addEventListener("change", function () {
+              if (checkbox.checked) {
+                if (readSet.artifactVersionIds.indexOf(av.artifact_version_id) === -1) readSet.artifactVersionIds.push(av.artifact_version_id);
+              } else {
+                readSet.artifactVersionIds = readSet.artifactVersionIds.filter(function (id) { return id !== av.artifact_version_id; });
+              }
+            });
+          }
+          row.append(checkbox, el("span", "", av.title + " · 第 " + av.version_no + " 版" + (av.ai_processing_allowed ? "" : "（不可纳入）")));
+          group.append(row);
+        });
+        scopeBox.append(group);
+      }
+      const anchors = scope.evidence_anchors || [];
+      if (anchors.length) {
+        scopeBox.append(el("div", "rs-hint", "证据锚点 " + anchors.length + " 条。"));
+      }
+      const cards = scope.method_cards || [];
+      if (cards.length) {
+        scopeBox.append(el("div", "rs-hint", "方法卡 " + cards.length + " 张。"));
+      }
+      if (scope.has_hidden) {
+        scopeBox.append(el("div", "rs-hint", "部分内容按权限隐藏。"));
+      }
+    }
+
+    function intentRules() {
+      const box = el("div", "intent-rule");
+      box.append(el("strong", "", "提问会由对应智能体处理："));
+      QUICK_ACTIONS.forEach(function (action) {
+        const line = el("div", "rule-line");
+        line.append(el("span", "", "「" + action.intent + "」 → "));
+        action.roles.forEach(function (role) {
+          line.append(rolePill(role));
+        });
+        box.append(line);
+      });
+      return box;
+    }
+
+    function quickActions(reading, runSlot, cardSlot) {
+      const box = el("div", "quick-actions");
+      QUICK_ACTIONS.forEach(function (action) {
+        const button = el("button", "quick-card");
+        button.type = "button";
+        button.append(
+          el("span", "q-name", action.label),
+          el("span", "q-hint", action.hint),
+        );
+        const roles = el("span", "q-roles");
+        action.roles.forEach(function (role) { roles.append(rolePill(role)); });
+        button.append(roles);
+        if (!reading.head_version_id) {
+          button.disabled = true;
+          button.title = "先确认这一版，再提问。";
+        } else {
+          button.addEventListener("click", function () {
+            askNext(button, reading, runSlot, cardSlot, action.intent, action.label);
+          });
+        }
+        box.append(button);
+      });
+      if (!reading.head_version_id) {
+        box.append(el("p", "meta", "先确认这一版，再提问。"));
+      }
+      return box;
+    }
+
+    async function askNext(button, reading, runSlot, cardSlot, intent, label) {
+      const before = reading.draft ? reading.draft.content_revision : null;
+      button.disabled = true;
+      const original = button.querySelector(".q-name");
+      if (original) original.textContent = label + "…";
+      const started = await api("/api/v1/projects/" + encodeURIComponent(reading.project_id) + "/agent-runs", {
+        method: "POST",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify({
+          intent: intent,
+          input_mode: "confirmed",
+          page_version_id: reading.head_version_id,
+          page_version_ids: readSet.pageVersionIds,
+          artifact_version_ids: readSet.artifactVersionIds,
+          exclusions: readSet.exclusions,
+        }),
+      });
+      button.disabled = false;
+      if (original) original.textContent = label;
+      if (!started.ok) {
+        runSlot.prepend(alertBox(started.message));
+        return;
+      }
+      const run = await api("/api/v1/agent-runs/" + encodeURIComponent(started.data.run_id));
+      if (!run.ok) {
+        runSlot.append(alertBox(run.message));
+      } else {
+        const tools = await fetchToolCalls(started.data.run_id);
+        renderRun(runSlot, run.data, tools);
+      }
+      await loadCandidates(cardSlot, reading);
+      const again = await api("/api/v1/pages/" + encodeURIComponent(reading.page_id) + "/draft");
+      if (again.ok) {
+        const after = again.data.draft ? again.data.draft.content_revision : null;
+        const same = before === after;
+        runSlot.append(el("p", "meta", same ? "运行完成。" : "运行完成，草稿已更新到 R" + after + "。"));
+      }
+    }
+
+    async function fetchToolCalls(runId) {
+      // 从 SSE 事件流回放里提取工具调用步骤（tool.completed）
+      try {
+        const response = await fetch("/api/v1/agent-runs/" + encodeURIComponent(runId) + "/events", {
+          headers: { Accept: "text/event-stream" },
+          credentials: "same-origin",
+        });
+        if (!response.ok) return [];
+        const text = await response.text();
+        const tools = [];
+        text.split("\n\n").forEach(function (frame) {
+          if (frame.indexOf("event: tool.completed") === -1) return;
+          const dataLine = frame.split("\n").find(function (line) { return line.indexOf("data: ") === 0; });
+          if (!dataLine) return;
+          try {
+            const event = JSON.parse(dataLine.slice(6));
+            const payload = event.payload || {};
+            if (payload.name) tools.push({ name: payload.name, status: payload.status });
+          } catch (_error) { /* 跳过无法解析的帧 */ }
+        });
+        return tools;
+      } catch (_error) {
+        return [];
+      }
+    }
+
+    function toolChain(tools) {
+      if (!tools || !tools.length) return null;
+      const box = el("div", "tool-chain");
+      tools.forEach(function (tool, index) {
+        if (index > 0) box.append(el("span", "tool-arrow", "→"));
+        const chip = el("span", "tool-chip " + (tool.status || "completed"));
+        chip.append(
+          el("span", "tool-name", TOOL_LABEL[tool.name] || tool.name),
+          el("span", "", TOOL_STATUS_LABEL[tool.status] || tool.status),
+        );
+        box.append(chip);
+      });
+      return box;
+    }
+
+    function renderRun(slot, run, tools) {
+      clear(slot);
+      const flow = el("div", "run-flow");
+      // ① 用户意图
+      const intent = el("div", "run-intent", "你的提问：", el("span", "", run.intent || "（空）"));
+      flow.append(intent);
+      // ② 工具调用链（ReAct 循环里的"行动"）
+      const chain = toolChain(tools);
+      if (chain) {
+        flow.append(el("div", "section-label", "工具调用链"));
+        flow.append(chain);
+      }
+      // ③ 角色卡（按依赖次序：证据 → 批评）
+      run.duties.forEach(function (step, index) {
+        if (index > 0) flow.append(el("div", "dep-arrow", "↓ 上一步的结果"));
+        flow.append(roleCard(step));
+      });
+      slot.append(
+        el("h2", "", "这次运行"),
+        el("p", "", run.status_label || ("状态：" + run.status)),
+      );
+      if (run.opening_gaps && run.opening_gaps.length) {
+        slot.append(el("p", "", "本次记录的缺口"));
+        run.opening_gaps.forEach(function (gap) { slot.append(el("p", "gap-item", gap)); });
+      }
+      slot.append(flow);
+    }
+
+    function roleCard(step) {
+      const role = step.role;
+      const card = el("div", "role-card role-" + role);
+      const head = el("div", "r-head");
+      head.append(
+        el("span", "r-name", step.role_label || role),
+        el("span", "r-status", step.status_label || ("状态：" + step.status)),
+      );
+      card.append(head);
+      if (step.summary) card.append(el("p", "r-summary", step.summary));
+      // 来源（可溯源）
+      const sources = step.reads || [];
+      if (sources.length) {
+        const box = el("div", "r-sources", el("strong", "", "依据："));
+        sources.forEach(function (item) {
+          if (item.target === "restricted") {
+            box.append(el("span", "source-item", "受限内容已隐藏"));
+          } else if (item.label) {
+            if (item.target === "artifact_version" && item.object_id) {
+              const link = el("a", "source-item", "· " + item.label);
+              link.href = "/api/v1/artifact-versions/" + encodeURIComponent(item.object_id) + "/content";
+              box.append(link);
+            } else {
+              box.append(el("span", "source-item", "· " + item.label));
+            }
+          } else {
+            box.append(el("span", "source-item", "· 一条记录"));
+          }
+        });
+        card.append(box);
+      }
+      // 缺口
+      const gaps = step.gaps || [];
+      if (gaps.length) {
+        const box = el("div", "r-gaps", el("strong", "", "缺口："));
+        gaps.forEach(function (gap) { box.append(el("span", "gap-item", "· " + gap)); });
+        card.append(box);
+      }
+      if (step.error) card.append(el("p", "", "失败：" + step.error));
+      return card;
+    }
+
+    async function loadCandidates(slot, reading) {
+      const result = await api("/api/v1/projects/" + encodeURIComponent(reading.project_id) + "/candidates");
+      clear(slot);
+      slot.append(el("h2", "", "待确认"));
+      if (!result.ok) {
+        slot.append(alertBox(result.message));
+        return;
+      }
+      const pending = result.data.candidates.filter(function (item) { return item.status === "pending"; });
+      if (!pending.length) {
+        slot.append(el("p", "", "暂无可确认的内容。"));
+        return;
+      }
+      pending.forEach(function (card) { slot.append(candidateCard(card, reading, slot)); });
+    }
+
+    function candidateCard(card, reading, slot) {
+      const block = el("article", "card");
+      block.append(
+        el("div", "section-label", "待确认"),
+        el("h3", "", card.status_label || "待确认"),
+      );
+      if (card.action_label) block.append(el("p", "", card.action_label));
+      if (card.edge_kind_label) block.append(el("p", "edge-kind-note", "关系类型：" + card.edge_kind_label));
+      if (card.summary) block.append(el("p", "", card.summary));
+      if (card.title) block.append(el("p", "", "将创建：" + card.title));
+      if (card.gaps && card.gaps.length) {
+        const gapBox = el("div");
+        gapBox.append(el("strong", "", "缺口："));
+        card.gaps.forEach(function (gap) { gapBox.append(el("p", "gap-item", gap)); });
+        block.append(gapBox);
+      }
+      if (!card.preview_ready) {
+        block.append(el("p", "", "这是一条过程记录，无需确认。"));
+        return block;
+      }
+      const preview = el("button", "", "预览");
+      preview.type = "button";
+      const reject = el("button", "quiet", "拒绝");
+      reject.type = "button";
+      const holder = el("div");
+      preview.addEventListener("click", function () { previewCard(card, reading, holder, slot); });
+      reject.addEventListener("click", function () { rejectCard(card, reading, slot); });
+      block.append(preview, reject, holder);
+      return block;
+    }
+
+    function previewBody(card, reading) {
+      const body = {
+        expected_page_version_id: reading.head_version_id,
+        expected_draft_content_revision: reading.draft ? reading.draft.content_revision : null,
+      };
+      return body;
+    }
+
+    async function previewCard(card, reading, holder, slot) {
+      clear(holder);
+      const result = await api("/api/v1/candidates/" + encodeURIComponent(card.candidate_id) + "/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf },
+        body: JSON.stringify(previewBody(card, reading)),
+      });
+      if (!result.ok) {
+        holder.append(alertBox(result.message));
+        return;
+      }
+      holder.append(el("p", "", "确认前的预览。"));
+      const affected = result.data.affected_objects || [];
+      if (!affected.length) holder.append(el("p", "", "即将改动的对象："));
+      affected.forEach(function (item) {
+        const bits = [];
+        Object.keys(item).forEach(function (key) { bits.push(key + " " + item[key]); });
+        holder.append(el("p", "meta", bits.join("，")));
+      });
+      const confirm = el("button", "", "确认");
+      confirm.type = "button";
+      confirm.addEventListener("click", function () {
+        commitCard(card, reading, result.data, confirm, slot);
+      });
+      holder.append(confirm);
+    }
+
+    async function commitCard(card, reading, preview, button, slot) {
+      const before = reading.draft ? reading.draft.content_revision : null;
+      button.disabled = true;
+      const body = previewBody(card, reading);
+      body.preview_id = preview.preview_id;
+      body.preview_hash = preview.preview_hash;
+      if (!body.expected_page_version_id) {
+        button.disabled = false;
+        slot.prepend(alertBox("先确认这一版，再提交。"));
+        return;
+      }
+      const result = await api("/api/v1/candidates/" + encodeURIComponent(card.candidate_id) + "/commit", {
+        method: "POST",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify(body),
+      });
+      if (!result.ok) {
+        button.disabled = false;
+        slot.prepend(alertBox(result.message));
+        return;
+      }
+      if (result.data.page_id && result.data.page_id !== reading.page_id) {
+        sessionStorage.setItem("sinuo-arrived", result.data.page_id);
+        location.assign("/projects/" + encodeURIComponent(reading.project_id) + "/pages/" + encodeURIComponent(result.data.page_id));
+        return;
+      }
+      const again = await api("/api/v1/pages/" + encodeURIComponent(reading.page_id) + "/draft");
+      const after = again.ok && again.data.draft ? again.data.draft.content_revision : null;
+      slot.prepend(alertBox(before === after ? "已确认。" : "已确认，草稿更新到 R" + after + "。"));
+      loadCandidates(slot, reading);
+    }
+
+    async function rejectCard(card, reading, slot) {
+      const before = reading.draft ? reading.draft.content_revision : null;
+      const result = await api("/api/v1/candidates/" + encodeURIComponent(card.candidate_id) + "/reject", {
+        method: "POST",
+        headers: writeHeaders(crypto.randomUUID()),
+        body: JSON.stringify({}),
+      });
+      const again = await api("/api/v1/pages/" + encodeURIComponent(reading.page_id) + "/draft");
+      const after = again.ok && again.data.draft ? again.data.draft.content_revision : null;
+      if (!result.ok) {
+        slot.prepend(alertBox(result.message));
+        return;
+      }
+      slot.prepend(alertBox(before === after ? "已拒绝。" : "已拒绝，草稿更新到 R" + after + "。"));
+      loadCandidates(slot, reading);
+    }
+
+    async function show() {
+      const session = await api("/api/v1/session");
+      if (!session.ok) {
+        renderLogin();
+        return;
+      }
+      csrf = session.data.csrf_token;
+      renderAccount(session.data);
+      const here = route();
+      renderTopnav(here);
+      const main = document.getElementById("main");
+      if (location.pathname === "/") {
+        location.replace("/projects");
+        return;
+      }
+      if (here.name === "missing") {
+        clear(main);
+        main.append(el("h1", "", "页面不存在"), el("p", "", "回到项目列表。"));
+        const back = el("a", "button", "回到项目");
+        back.href = "/projects";
+        main.append(back);
+        return;
+      }
+      if (here.name === "shelf") {
+        const listed = await api("/api/v1/projects");
+        if (listed.status === 401) return renderLogin();
+        if (!listed.ok) {
+          clear(main);
+          main.append(alertBox(listed.message));
+          return;
+        }
+        renderShelf(listed.data.projects);
+        return;
+      }
+      if (here.name === "stages") {
+        const reading = await api("/api/v1/projects/" + encodeURIComponent(here.projectId) + "/stages");
+        if (reading.status === 401) return renderLogin();
+        if (!reading.ok) {
+          clear(main);
+          main.append(alertBox(reading.message));
+          return;
+        }
+        renderStages(reading.data);
+        return;
+      }
+      const draft = await api("/api/v1/pages/" + encodeURIComponent(here.pageId) + "/draft");
+      const stages = await api("/api/v1/projects/" + encodeURIComponent(here.projectId) + "/stages");
+      if (draft.status === 401 || stages.status === 401) return renderLogin();
+      if (!draft.ok) {
+        clear(main);
+        main.append(alertBox(draft.message));
+        return;
+      }
+      let stageName = "未命名阶段";
+      let projectTitle = "这个项目";
+      if (stages.ok) {
+        projectTitle = stages.data.title;
+        const found = stages.data.stages.find(function (stage) {
+          return stage.stage_id === draft.data.stage_id;
+        });
+        if (found && found.name) stageName = found.name;
+      }
+      renderPage(draft.data, stageName, projectTitle);
+    }
+
+    show();
+  </script>
+</body>
+</html>

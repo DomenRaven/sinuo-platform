@@ -22,6 +22,7 @@ from sinuo.api.versions.routes import _guard
 from sinuo.application.auth.authorizer import SessionAuthorizer
 from sinuo.application.evidence.anchors import AnchorInvalid, AnchorView, create_anchor
 from sinuo.application.idempotency import CommandResponse, CommandScope, execute_idempotent
+from sinuo.application.retrieval.search import rebuild_evidence_index
 from sinuo.domain.auth.errors import InvalidSchema
 from sinuo.domain.auth.resource import ResourceRef
 from sinuo.domain.public_contract import Action, ErrorCode
@@ -219,6 +220,7 @@ async def post_evidence_anchor(project_id: str, request: Request) -> JSONRespons
                     extractor_version=body.extractor_version,
                     now=now,
                 )
+                rebuild_evidence_index(active)
                 return CommandResponse(201, _payload(created))
 
             response = execute_idempotent(session, scope, request_document, authorize, handler)

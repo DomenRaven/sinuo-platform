@@ -27,6 +27,7 @@ from sinuo.api.versions.routes import _guard
 from sinuo.application.agents.execute import (
     AgentRunRequest,
     RunPlanRejected,
+    bind_theory_root,
     finish_agent_run,
     open_agent_run,
 )
@@ -57,11 +58,46 @@ class StartRunBody(BaseModel):
     question: str = Field(default="", max_length=80)
     situation: str = Field(default="", max_length=80)
     constraints: dict[str, bool] = Field(default_factory=dict)
+    exclusions: list[str] = Field(default_factory=list)
+    page_version_ids: list[str] = Field(default_factory=list)
+    artifact_version_ids: list[str] = Field(default_factory=list)
 
     @field_validator("intent", "query", "question", "situation")
     @classmethod
     def _strip_text(cls, value: str) -> str:
         return value.strip()
+
+    @field_validator("exclusions")
+    @classmethod
+    def _exclusions(cls, value: list[str]) -> list[str]:
+        if len(value) > 4:
+            raise ValueError("exclusions")
+        allowed = {"theory", "methods"}
+        cleaned: list[str] = []
+        for item in value:
+            if item not in allowed:
+                raise ValueError("exclusions")
+            if item not in cleaned:
+                cleaned.append(item)
+        return cleaned
+
+    @field_validator("page_version_ids", "artifact_version_ids")
+    @classmethod
+    def _version_ids(cls, value: list[str]) -> list[str]:
+        if len(value) > 8:
+            raise ValueError("version_ids")
+        cleaned: list[str] = []
+        for item in value:
+            if (
+                not isinstance(item, str)
+                or item.strip() == ""
+                or item != item.strip()
+                or len(item) > 64
+            ):
+                raise ValueError("version_ids")
+            if item not in cleaned:
+                cleaned.append(item)
+        return cleaned
 
     @field_validator("page_version_id")
     @classmethod
@@ -127,23 +163,28 @@ def start_router(provider: ModelProvider | None = None) -> APIRouter:
                 engine,
                 principal,
                 project_id,
-                _run_request(body, plan.tasks, plan.roles, now),
+                _run_request(body, plan.tasks, plan.roles, plan.gaps, now),
             )
         except (IntentRejected, RunPlanRejected, ValueError) as exc:
             raise InvalidSchema() from exc
         chosen, owns_client = _select_provider(request, provider)
         try:
-            await asyncio.to_thread(
-                finish_agent_run,
-                engine,
-                principal,
-                opened.run_id,
-                _bind_provider(chosen),
-                now=now,
-            )
+            with bind_theory_root(get_settings(request).theory_root):
+                await asyncio.to_thread(
+                    finish_agent_run,
+                    engine,
+                    principal,
+                    opened.run_id,
+                    _bind_provider(chosen),
+                    now=now,
+                )
         finally:
             if owns_client:
-                await chosen.client.aclose()
+                try:
+                    await chosen.client.aclose()
+                except RuntimeError as exc:
+                    if "Event loop is closed" not in str(exc):
+                        raise
         data = {
             "run_id": opened.run_id,
             "snapshot_id": opened.snapshot_id,
@@ -254,6 +295,7 @@ def _run_request(
     body: StartRunBody,
     tasks: tuple,
     roles: tuple[str, ...],
+    gaps: tuple[str, ...],
     now: float,
 ) -> AgentRunRequest:
     query = body.query
@@ -271,4 +313,8 @@ def _run_request(
         constraints=body.constraints,
         page_version_id=body.page_version_id,
         now=now,
+        opening_gaps=gaps,
+        exclusions=tuple(body.exclusions),
+        page_version_ids=tuple(body.page_version_ids),
+        artifact_version_ids=tuple(body.artifact_version_ids),
     )

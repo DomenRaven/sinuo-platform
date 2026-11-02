@@ -71,6 +71,8 @@ class _Facts:
     page_title: str | None
     page_body: str | None
     page_hash: str | None
+    page_nodes: tuple[tuple[str, str | None, str | None, str | None], ...]
+    page_edges: tuple[tuple[str, str, str, str | None], ...]
     input_hash: str
 
 
@@ -144,6 +146,17 @@ def _read(
         status = "not_indexed"
     visible_page = snapshot is not None and snapshot.page_version_id is not None
     page_id = snapshot.page_version_id if visible_page and snapshot is not None else None
+    page_nodes: tuple[tuple[str, str | None, str | None, str | None], ...] = ()
+    page_edges: tuple[tuple[str, str, str, str | None], ...] = ()
+    if visible_page and snapshot is not None:
+        page_nodes = tuple(
+            (node.node_id, node.kind, node.content, node.artifact_version_id)
+            for node in snapshot.nodes
+        )
+        page_edges = tuple(
+            (edge.edge_id, edge.source_node_id, edge.target_node_id, edge.kind)
+            for edge in snapshot.edges
+        )
     frozen = {
         "intent": intent,
         "query": query,
@@ -163,6 +176,8 @@ def _read(
         page_title=snapshot.title if visible_page and snapshot is not None else None,
         page_body=snapshot.body if visible_page and snapshot is not None else None,
         page_hash=snapshot.content_hash if visible_page and snapshot is not None else None,
+        page_nodes=page_nodes,
+        page_edges=page_edges,
         input_hash=_digest(_canonical(frozen)),
     )
 
@@ -219,6 +234,20 @@ def _run_roles(provider: ModelProvider, snapshot: InputSnapshot, tasks) -> dict[
     return spoken
 
 
+def _page_nodes(facts: _Facts) -> list[dict[str, str | None]]:
+    return [
+        {"node_id": node_id, "kind": kind, "content": content, "artifact_version_id": artifact_id}
+        for node_id, kind, content, artifact_id in facts.page_nodes
+    ]
+
+
+def _page_edges(facts: _Facts) -> list[dict[str, str | None]]:
+    return [
+        {"edge_id": edge_id, "source_node_id": source, "target_node_id": target, "kind": kind}
+        for edge_id, source, target, kind in facts.page_edges
+    ]
+
+
 def _outputs(facts: _Facts) -> dict[str, dict]:
     evidence = {
         "status": facts.evidence_status,
@@ -227,6 +256,8 @@ def _outputs(facts: _Facts) -> dict[str, dict]:
         "page_version_id": facts.page_version_id,
         "page_title": facts.page_title,
         "page_body": facts.page_body,
+        "page_nodes": _page_nodes(facts),
+        "page_edges": _page_edges(facts),
     }
     method = {"question": METHOD_QUESTION, "method_card": None}
     proposal = {
@@ -236,6 +267,8 @@ def _outputs(facts: _Facts) -> dict[str, dict]:
         "excerpts": evidence["excerpts"],
         "page_version_id": facts.page_version_id,
         "page_title": facts.page_title,
+        "page_nodes": _page_nodes(facts),
+        "page_edges": _page_edges(facts),
         "method_card": None,
         "method_question": METHOD_QUESTION,
     }

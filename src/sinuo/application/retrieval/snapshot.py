@@ -26,6 +26,8 @@ _DENIED = (ActionForbidden, NotFoundOrHidden, SourceRedacted)
 class SnapshotNode:
     node_id: str
     artifact_version_id: str | None
+    kind: str | None = None
+    content: str | None = None
 
 
 @dataclass(frozen=True)
@@ -33,6 +35,7 @@ class SnapshotEdge:
     edge_id: str
     source_node_id: str
     target_node_id: str
+    kind: str | None = None
 
 
 @dataclass(frozen=True)
@@ -162,10 +165,14 @@ def _nodes(raw: object) -> tuple[SnapshotNode, ...]:
         if not isinstance(node_id, str) or node_id == "":
             continue
         artifact_id = item.get("artifact_version_id")
+        kind = item.get("kind")
+        content = item.get("content")
         nodes.append(
             SnapshotNode(
                 node_id,
                 artifact_id if isinstance(artifact_id, str) and artifact_id else None,
+                kind if isinstance(kind, str) and kind else None,
+                content if isinstance(content, str) and content else None,
             )
         )
     return tuple(nodes)
@@ -183,5 +190,13 @@ def _edges(raw: object) -> tuple[SnapshotEdge, ...]:
         target = item.get("target_node_id")
         if not all(isinstance(value, str) and value for value in (edge_id, source, target)):
             continue
-        edges.append(SnapshotEdge(edge_id, source, target))
+        kind = item.get("kind")
+        edges.append(
+            SnapshotEdge(
+                edge_id,
+                source,
+                target,
+                kind if isinstance(kind, str) and kind else None,
+            )
+        )
     return tuple(edges)

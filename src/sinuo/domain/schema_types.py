@@ -14,6 +14,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from sinuo.domain.page_nodes import EDGE_KINDS
 from sinuo.domain.public_contract import (
     AVAILABILITY_STATES,
     GRANT_SCOPE_TYPES,
@@ -297,7 +298,7 @@ def canonical_document(document: Mapping[str, Any]) -> str:
     for edge in edges:
         if not isinstance(edge, Mapping):
             raise DocumentSchemaError("edge must be an object")
-        if set(edge) != {"edge_id", "source_node_id", "target_node_id"}:
+        if set(edge) - {"edge_id", "source_node_id", "target_node_id", "kind"}:
             raise DocumentSchemaError("edge keys are fixed")
         edge_id = _string_field(edge.get("edge_id"), label="edge_id")
         source = _string_field(edge.get("source_node_id"), label="source_node_id")
@@ -307,9 +308,13 @@ def canonical_document(document: Mapping[str, Any]) -> str:
         if source not in seen_nodes or target not in seen_nodes:
             raise DocumentSchemaError("edge endpoints must be nodes in this document")
         seen_edges.add(edge_id)
-        normalized_edges.append(
-            {"edge_id": edge_id, "source_node_id": source, "target_node_id": target}
-        )
+        item = {"edge_id": edge_id, "source_node_id": source, "target_node_id": target}
+        if "kind" in edge:
+            kind = edge.get("kind")
+            if not isinstance(kind, str) or kind not in EDGE_KINDS:
+                raise DocumentSchemaError("edge kind is invalid")
+            item["kind"] = kind
+        normalized_edges.append(item)
     payload = {"schema_version": 1, "nodes": normalized_nodes, "edges": normalized_edges}
     return canonical_json(payload)
 

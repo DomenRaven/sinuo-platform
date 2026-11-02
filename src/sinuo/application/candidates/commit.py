@@ -1001,6 +1001,7 @@ def projected_draft(content_json: str, proposal: ParsedProposal) -> tuple[str, s
             proposal.edge_id or "",
             proposal.source_node_id or "",
             proposal.target_node_id or "",
+            proposal.edge_kind,
         )
     if proposal.action == "attach_artifact_version":
         return _attach_artifact(
@@ -1029,18 +1030,20 @@ def _with_edge(
     edge_id: str,
     source_node_id: str,
     target_node_id: str,
+    kind: str | None = None,
 ) -> tuple[str, str]:
     document = json.loads(content_json)
     edges = list(document["edges"])
     if any(isinstance(edge, dict) and edge.get("edge_id") == edge_id for edge in edges):
         raise InvalidSchema()
-    edges.append(
-        {
-            "edge_id": edge_id,
-            "source_node_id": source_node_id,
-            "target_node_id": target_node_id,
-        }
-    )
+    item = {
+        "edge_id": edge_id,
+        "source_node_id": source_node_id,
+        "target_node_id": target_node_id,
+    }
+    if kind is not None:
+        item["kind"] = kind
+    edges.append(item)
     document["edges"] = edges
     return _canonical_draft(document)
 

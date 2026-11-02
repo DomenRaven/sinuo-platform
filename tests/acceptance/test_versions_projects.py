@@ -470,7 +470,7 @@ def test_repeated_parallel_key_creates_one_page_without_next_edge(ready):
         assert page.stage_id == stage_id
         assert page.title == "synthetic-parallel"
         assert page.head_version_id == created.id
-        assert _count(session, Stage) == 1
+        assert _count(session, Stage) == 8
         audits = session.scalars(
             select(AuditEvent).where(AuditEvent.command == Action.PAGE_CREATE.value)
         ).all()
