@@ -1,81 +1,144 @@
-# 思诺后端施工骨架
+# 思诺（Seno）—— AI 辅助设计过程管理平台
 
-Grok 从 `prompts/00_GROK_总控开工.md` 开工，先读 `docs/construction/00_施工总览与完成标准.md`。施工合同、任务卡和参考资料都在本仓库内。
+> 面向工业设计课程项目的 **AI 辅助设计与过程管理平台**。
+> 学生用「书—章—页—节点」保存设计过程；四个智能体分工**查证据、选方法、检查过程、提议下一步**；但**所有决定与确认权始终在人手里**。
 
-本仓库提供后端开发起点。已完成的范围是配置、健康检查、数据库迁移与事务基元、幂等命令存储、Outbox 投递租约，以及可替换模型的有界任务执行器。项目、章页、作品、ACL、候选提交、SSE、搜索和导出仍需按施工文档实现。当前没有 UI。
+思诺做的事：把设计过程中「为什么要这么做、依据是什么、试过哪些、怎么决定的」这条推理链，结构化和可回溯地记录下来，并让 AI 在每一步帮你查证、把关、建议。它**不是**训练平台，**不是** CAD/Figma 的替代品，**不做** 3D 建模。
+
+---
+
+## 核心功能
+
+### 三层组织：书 → 章 → 页 → 节点 → 版本
+
+| 层级 | 含义 |
+|---|---|
+| **书** | 一个设计项目 |
+| **章** | 一个设计阶段（固定 8 个模板） |
+| **页** | 阶段下的具体议题，同阶段可有平行页 |
+| **节点** | 页内的一条推理记录（7 类） |
+| **边** | 节点间的关系连线（4 类） |
+| **版本** | 每次「固化/确认」产生的快照 |
+
+- **八阶段（固定模板）**：任务与情境 → 用户与场景研究 → 问题及机会定义 → 设计要求 → 概念探索 → 深化与原型 → 测试与迭代 → 表达与复盘。
+- **七类节点**：问题、证据、洞察、要求、作品、测试、决定（后三类由人确认）。
+- **四类关系边**：承接（derives）、支持（supports）、反例（refutes）、引用（cites）—— 可在页内**拖拽连线**。
+
+### 四个智能体（一次运行至多三个职责）
+
+| 职责 | 做什么 |
+|---|---|
+| 课题澄清 | 澄清任务目标、汇总简报 |
+| 证据查找 | 查证据、给依据、报缺口 |
+| 方法建议 | 匹配方法卡 |
+| 过程检查 | 读节点与阶段表、判断能否进入下一阶段、提议新节点或关系边 |
+
+- **意图分流**：`查证据`→证据查找；`选方法`→方法建议；`检查下一步`→证据+过程检查；`简报变化`→课题澄清。
+- **候选确认机制**：智能体的提议一律先变成「待确认」候选卡，人「预览→确认/拒绝」后才生效。
+- **证据可回溯**：每条证据锚定到上传原件（页码/区间），结论能点回出处。
+
+### 三屏界面
+
+| 路由 | 界面 |
+|---|---|
+| `/projects` | 项目书架（登录、项目列表、新建项目） |
+| `/projects/{项目id}` | 项目地图（8 章泳道 + 页缩略图 + 跨章承接连线 + 页拖拽重排） |
+| `/projects/{项目id}/pages/{页id}` | 单页工作台（写节点、页内推理图、关系边、中间交付物、对话、读集勾选、候选确认） |
+
+---
 
 ## 技术栈
 
-| 模块 | 选择 | 当前状态 |
-| --- | --- | --- |
-| 运行时 | Python 3.12–3.14 | 依赖范围见 pyproject.toml |
-| HTTP | FastAPI + Uvicorn | `/healthz`、`/readyz` 可运行 |
-| 配置 | Pydantic Settings | `.env` / `SINUO_` 环境变量，密钥使用 SecretStr |
-| 关系存储 | SQLAlchemy 2 + SQLite WAL | FK、busy_timeout、短 `BEGIN IMMEDIATE` 写事务 |
-| 迁移 | Alembic | `0001_primitives` 创建 3 张基础表，`0002_lease_invariants` 追加租约一致性约束 |
-| 测试 | pytest + HTTPX TestClient | 真实 SQLite 迁移、双连接竞争、回滚、幂等与租约过期 |
-| 模型 | `ModelProvider` 协议 | `DisabledModelProvider` 显式返回未接入状态，未调用 DeepSeek |
-| 任务执行 | Python asyncio 有界 DAG | 输入值不可变、依赖等待、失败阻断、至多 3 个职责 |
+| 模块 | 选择 |
+|---|---|
+| 运行时 | Python 3.12–3.14 |
+| HTTP | FastAPI + Uvicorn |
+| 存储 | SQLAlchemy 2 + SQLite（WAL），Alembic 迁移（44 张业务表） |
+| 检索 | SQLite trigram 全文索引（证据）+ 字符 n-gram（理论库/方法库） |
+| 大模型 | DeepSeek（澄清/证据走 `SINUO_MODEL_NAME`，方法/过程检查走 `SINUO_MODEL_NAME_REASONING`） |
+| 智能体编排 | 自研 asyncio 有界 DAG runner（输入不可变、依赖等待、失败阻断、至多 3 职责） |
+| 前端 | 单文件 SPA `web/desk.html`（无构建依赖，苹果式视觉） |
+| 测试 | pytest + HTTPX TestClient（455 通过 / 2 真实模型测试排除） |
 
-包版本采用兼容区间，交付包含 `uv.lock`；优先按锁文件安装，更新依赖后重新核验。不要将“依赖可解析”当作所有业务功能已实现。
+---
 
 ## 本地启动
 
-在项目根打开 PowerShell。使用已有 Python 3.12 或以上虚拟环境；新的环境可按下列命令建立。依赖安装会访问包源。
+在项目根目录执行（Windows PowerShell）：
 
 ```powershell
+# 1. 建立虚拟环境（Python 3.12 或以上）
 py -3.12 -m venv .venv
+
+# 2. 安装依赖
 .\.venv\Scripts\python -m pip install -e ".[dev]"
+
+# 3. 配置环境（如已存在则逐项补字段）
 Copy-Item .env.example .env
+
+# 4. 初始化数据库（迁移）
 .\.venv\Scripts\alembic upgrade head
+
+# 5. 启动服务
 .\.venv\Scripts\uvicorn sinuo.api.app:create_app --factory --host 127.0.0.1 --port 8000
 ```
 
-若 `.env` 已存在，保留现有内容并逐项补字段。默认数据库为 `var/sinuo.db`，此目录属于应用运行数据并被 Git 忽略。`/healthz` 表示进程存活；`/readyz` 仅在当前基线迁移版本匹配时返回 `scope=foundation`。应用启动不会自动建表，也不会在迁移缺失时假报可用。
+访问 **http://127.0.0.1:8000**，使用演示账号登录：
 
-测试目录指向本任务施工目录，避免临时测试数据库落入用户资料目录。日期按实际执行日替换。
+| 项 | 值 |
+|---|---|
+| 登录名 | `synthetic-lead` |
+| 密码 | `synthetic-pass-lead` |
+
+- `/healthz` 表示进程存活；`/readyz` 返回 `status=ready` 与当前迁移版本。
+- 默认数据库 `var/sinuo.db`（应用运行数据，被 Git 忽略）。
+- 需要真实大模型能力时，在 `.env` 中配置 DeepSeek 密钥与 `SINUO_MODEL_NAME` / `SINUO_MODEL_NAME_REASONING`；未配置时智能体返回「未接入」状态，不影响界面与流程演示。
+
+### 运行测试
 
 ```powershell
-New-Item -ItemType Directory -Force '_施工文件/2026-10-29_codex/99_临时文件' | Out-Null
-$env:PYTHONDONTWRITEBYTECODE = '1'
-.\.venv\Scripts\python -m pytest -q -o cache_dir='_施工文件/2026-10-29_codex/99_临时文件/pytest-cache' --basetemp='_施工文件/2026-10-29_codex/99_临时文件/pytest'
+.\.venv\Scripts\python -m pytest -q
 ```
 
-## 目录及所有权
+### 演示案例
+
+仓库含一套可复现的 **OXO Good Grips 削皮器** 完整设计过程演示（8 章 14 页，公开来源语料）。一键复刻脚本：
+
+```bash
+# 合并 OXO 理论语料 + 种子方法卡（幂等）
+./.venv/Scripts/python scripts/build_oxo_theory.py
+./.venv/Scripts/python scripts/seed_oxo_methods.py
+# 全流程驱动（建项目→传证据→8 章→多次提问→候选确认）
+./.venv/Scripts/python scripts/oxo_live_walk.py
+```
+
+---
+
+## 仓库结构
 
 | 路径 | 责任 |
-| --- | --- |
-| `src/sinuo/api` | HTTP 请求、响应、认证依赖与 SSE 适配器 |
-| `src/sinuo/domain` | 领域类型、不变量、错误；不依赖 Web、模型和磁盘 |
-| `src/sinuo/application` | 用例、确认提交、事务协调与授权调用 |
-| `src/sinuo/infrastructure` | 数据库、原件库、外部服务适配 |
+|---|---|
+| `src/sinuo/api` | HTTP 路由、认证依赖 |
+| `src/sinuo/domain` | 领域类型、不变量、错误（不依赖 Web/模型/磁盘） |
+| `src/sinuo/application` | 用例、确认提交、事务协调、智能体编排 |
+| `src/sinuo/infrastructure` | 数据库、原件库、迁移、外部服务适配 |
 | `src/sinuo/agents` | 输入/输出合同、专责能力与模型接口 |
-| `src/sinuo/workers` | Outbox、租约、派生任务执行 |
-| `migrations` | 模型变更与迁移；由集成负责人统一合入 |
-| `tests` | 对应领域约束、HTTP、并发与故障测试 |
+| `web/desk.html` | 前端单页应用（书架 / 项目地图 / 单页工作台） |
+| `tests/` | 领域约束、HTTP、并发与故障测试 |
+| `docs/` | 用户手册、Demo 视频交接文档、权威白皮书 |
+| `scripts/` | 演示数据生成、全流程驱动、种子脚本 |
 
-## 当前基元的正确使用方式
+---
 
-`write_uow(engine)` 在 SQLite 上建立短写事务。`execute_idempotent` 必须在此边界内调用，并从可信认证上下文取得项目、操作者和动作。它首先调用当前授权检查，再按“项目 + 操作者 + 命令 + 请求键”查记录；同键异体抛 `IdempotencyConflict`。命令效果、Outbox 和幂等结果由调用者一次提交。授权回调在重放结果时同样执行。示例测试里的 `allow` 仅供测试使用，业务路由必须接入真实 ACL。
+## 权威依据与文档
 
-`claim_delivery` 用条件更新抢占待处理或已过期的租约，成功时递增 fencing token。工作在事务外执行；回写派生结果和 `complete_delivery` 必须处于同一短事务，后者按 token、owner、状态和截止时间拦截旧工作者。远端外部副作用还需要独立的对方幂等键；该基元不声称跨系统恰好一次。
+- `docs/思诺用户使用手册.md` —— 终端用户完整手册。
+- `docs/DEMO视频交接文档.md` —— 面向演示视频制作的交接说明。
+- `docs/reference/` —— 产品白皮书、UI 白皮书、技术实施规范（权威定义）。
 
-`DagRunner` 是可测试的内存执行边界，尚未接入持久 AgentRun、任务恢复、读工具网关和候选发布。它只返回独立结果，不执行领域命令。开发完整编排时保留当前依赖与失败测试，并增加持久状态、取消、租约、晚到隔离和当前权限复核。`model_enabled=true` 只验证配置，不会自动把未实现的 DeepSeek 传输变成可用服务。
+---
 
-## 下一步开发边界
+## 使用许可与来源说明
 
-先实现领域 schema、身份与对象 ACL、版本/草稿 CAS、不可变作品原件、确认提交事务，再接持久编排和只读工具。对外发布业务路由前，其授权、重放和越权测试必须通过。测试日志只描述已实际运行的命令与结果；本骨架自身不能证明完整产品通过验收。
-
-
-## 当前施工状态（2026-10-30）
-
-T01 / G0 已验收；T02 身份与授权、T03 领域模型与迁移可并行认领。完整范围、66 项测试与迁移/启动证据见 [基础交接](workpool/handoffs/T01_BASELINE_20261030.md)。Grok 继续使用总控提示词并以工作池最新状态推进，不从零重做施工包。整体进度见 [续工验收记录](施工续工验收记录_20261030.md)。
-
-若已安装 uv，可用 `uv sync --frozen --extra dev` 按交付锁文件建立环境；将 UV_PROJECT_ENVIRONMENT/UV_CACHE_DIR 指向 AGENTS 规定的施工临时目录。README 中的 pip 安装是兼容路径，不能据此宣称使用了锁定版本。
-
-
-## 文档勘误后的入口
-
-当前状态以 [当前施工基线](当前施工基线.md) 和工作池为准。具体代码由Grok施工，Codex负责架构/文档与验收监督；T01 done只指G0基础范围，生产认证隔离在T02待实现。技术/UI原文已受控勘误，旧报告与旧83项清单保留为历史。
-
-立即开工请读 [Grok开工入口](GROK_START_HERE.md)；真实多代理要求编码宿主具备文件、终端和子代理工具，提示词本身不会赋予这些能力。
+- OXO 削皮器演示语料来自公开资料（Cooper Hewitt 设计博物馆馆藏、美国专利 US4974286/USRE34194、Smart Design 公开记述、Santoprene 厂商指南、通用设计中心定义），均标注来源，且不含任何编造的样本量/通过率/临床数据。
+- 项目为课程作业（《设计大数据基础》），采用 Vibe Coding 方式，借助 Cursor、WorkBuddy 等 AI 编程工具完成需求描述、调试与迭代。

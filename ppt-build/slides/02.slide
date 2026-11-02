@@ -1,0 +1,27 @@
+<Slide style={{ padding: '60px 60px', background: '#FFFFFF' }}>
+  <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E293B' }}>项目目标：让设计过程有据可依、可回溯</Text>
+  <Box style={{ width: '100%', height: 1, background: '#E5E7EB', marginTop: 16, marginBottom: 30 }} />
+  <Box style={{ flexDirection: 'row', gap: 22 }}>
+    <Box style={{ flex: 5, flexDirection: 'column', background: '#EFF6FF', borderRadius: 10, padding: '28px 26px' }}>
+      <Text style={{ fontSize: 15, color: '#64748B', letterSpacing: 1 }}>痛点 01</Text>
+      <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1E3A8A', marginTop: 10 }}>过程不可回溯</Text>
+      <Text style={{ fontSize: 18, color: '#475569', marginTop: 12, lineHeight: 1.6 }}>做完只剩渲染图，"为什么这么做、依据是什么、怎么决定的"散落各处，教师无法评估设计思维。</Text>
+      <Text style={{ fontSize: 18, color: '#2563EB', marginTop: 16, fontWeight: 'bold' }}>→ 书·章·页·节点·版本 结构化保存</Text>
+    </Box>
+    <Box style={{ flex: 4, flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, padding: '28px 26px' }}>
+      <Text style={{ fontSize: 15, color: '#64748B', letterSpacing: 1 }}>痛点 02</Text>
+      <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1E3A8A', marginTop: 10 }}>依据不清、决策无据</Text>
+      <Text style={{ fontSize: 18, color: '#475569', marginTop: 12, lineHeight: 1.6 }}>缺乏对证据与方法论的调用，"拍脑袋"做决定。</Text>
+      <Text style={{ fontSize: 18, color: '#2563EB', marginTop: 16, fontWeight: 'bold' }}>→ 证据查找 + 方法建议，锚定出处</Text>
+    </Box>
+    <Box style={{ flex: 3, flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, padding: '28px 26px' }}>
+      <Text style={{ fontSize: 15, color: '#64748B', letterSpacing: 1 }}>痛点 03</Text>
+      <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#1E3A8A', marginTop: 10 }}>缺乏过程把关</Text>
+      <Text style={{ fontSize: 18, color: '#475569', marginTop: 12, lineHeight: 1.6 }}>无法判断阶段是否做扎实、能否往下走。</Text>
+      <Text style={{ fontSize: 18, color: '#2563EB', marginTop: 16, fontWeight: 'bold' }}>→ 过程检查把关，确认权在人</Text>
+    </Box>
+  </Box>
+  <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#1E3A8A', borderRadius: 10, padding: '18px 24px', marginTop: 30 }}>
+    <Text style={{ fontSize: 19, color: '#FFFFFF', fontWeight: 'bold' }}>一句话定位：学生写，AI 查证、选方法、检查过程、提议下一步；但所有决定，都由人亲自确认。</Text>
+  </Box>
+</Slide>

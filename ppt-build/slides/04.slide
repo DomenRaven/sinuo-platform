@@ -1,0 +1,41 @@
+<Slide style={{ padding: '60px 60px', background: '#FFFFFF' }}>
+  <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E293B' }}>四个智能体，一次运行至多三个职责</Text>
+  <Box style={{ width: '100%', height: 1, background: '#E5E7EB', marginTop: 16, marginBottom: 28 }} />
+  <Box style={{ flexDirection: 'row', gap: 20 }}>
+    <Box style={{ flex: 3, flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, overflow: 'hidden' }}>
+      <Box style={{ height: 6, background: '#2563EB' }} />
+      <Box style={{ padding: '22px 22px' }}>
+        <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#1E3A8A' }}>证据查找</Text>
+        <Text style={{ fontSize: 17, color: '#475569', marginTop: 10, lineHeight: 1.55 }}>从上传原件中检索依据，锚定出处，诚实报告缺口。</Text>
+        <Text style={{ fontSize: 16, color: '#2563EB', marginTop: 14, fontWeight: 'bold' }}>触发「查证据 / 找依据」</Text>
+      </Box>
+    </Box>
+    <Box style={{ flex: 3, flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, overflow: 'hidden' }}>
+      <Box style={{ height: 6, background: '#1E3A8A' }} />
+      <Box style={{ padding: '22px 22px' }}>
+        <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#1E3A8A' }}>过程检查</Text>
+        <Text style={{ fontSize: 17, color: '#475569', marginTop: 10, lineHeight: 1.55 }}>通读节点与阶段表，判断能否进入下一阶段，提议新节点或关系边。</Text>
+        <Text style={{ fontSize: 16, color: '#2563EB', marginTop: 14, fontWeight: 'bold' }}>触发「检查下一步」</Text>
+      </Box>
+    </Box>
+    <Box style={{ flex: 2, flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, overflow: 'hidden' }}>
+      <Box style={{ height: 6, background: '#3B82F6' }} />
+      <Box style={{ padding: '22px 22px' }}>
+        <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#1E3A8A' }}>课题澄清</Text>
+        <Text style={{ fontSize: 17, color: '#475569', marginTop: 10, lineHeight: 1.55 }}>澄清任务目标、汇总简报。</Text>
+        <Text style={{ fontSize: 16, color: '#2563EB', marginTop: 14, fontWeight: 'bold' }}>触发「简报变化」</Text>
+      </Box>
+    </Box>
+    <Box style={{ flex: 2, flexDirection: 'column', background: '#F8FAFC', borderRadius: 10, overflow: 'hidden' }}>
+      <Box style={{ height: 6, background: '#06B6D4' }} />
+      <Box style={{ padding: '22px 22px' }}>
+        <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#1E3A8A' }}>方法建议</Text>
+        <Text style={{ fontSize: 17, color: '#475569', marginTop: 10, lineHeight: 1.55 }}>匹配方法卡，给出方法论。</Text>
+        <Text style={{ fontSize: 16, color: '#2563EB', marginTop: 14, fontWeight: 'bold' }}>触发「选方法」</Text>
+      </Box>
+    </Box>
+  </Box>
+  <Box style={{ flexDirection: 'row', alignItems: 'center', background: '#EFF6FF', borderRadius: 10, padding: '16px 22px', marginTop: 26 }}>
+    <Text style={{ fontSize: 18, color: '#1E3A8A' }}>意图分流：<span style={{ fontWeight: 'bold' }}>查证据</span>→证据查找 · <span style={{ fontWeight: 'bold' }}>检查下一步</span>→证据+过程检查 · <span style={{ fontWeight: 'bold' }}>选方法</span>→方法建议 · <span style={{ fontWeight: 'bold' }}>简报变化</span>→课题澄清</Text>
+  </Box>
+</Slide>

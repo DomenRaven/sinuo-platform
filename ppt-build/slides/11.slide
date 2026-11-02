@@ -1,0 +1,24 @@
+<Slide style={{ padding: '60px 60px', background: '#FFFFFF' }}>
+  <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E293B' }}>目前的不足与后续改进</Text>
+  <Box style={{ width: '100%', height: 1, background: '#E5E7EB', marginTop: 16, marginBottom: 28 }} />
+  <Box style={{ flexDirection: 'row', gap: 28 }}>
+    <Box style={{ flex: 1, flexDirection: 'column', background: '#F8FAFC', borderRadius: 12, padding: '24px 24px' }}>
+      <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#64748B' }}>目前的不足</Text>
+      <Box style={{ flexDirection: 'column', gap: 12, marginTop: 18 }}>
+        <Text style={{ fontSize: 17, color: '#475569', lineHeight: 1.5 }}>① 语义检索未启用：Python 3.14 无 torch，BGE 用不了，暂以字符 n-gram 兜底。</Text>
+        <Text style={{ fontSize: 17, color: '#475569', lineHeight: 1.5 }}>② 审阅/导出/历史谱系/资源库有后端接口，暂无独立页面。</Text>
+        <Text style={{ fontSize: 17, color: '#475569', lineHeight: 1.5 }}>③ 检索索引快照（T13c）未完成，无法按清单重演。</Text>
+        <Text style={{ fontSize: 17, color: '#475569', lineHeight: 1.5 }}>④ 未做 3D 展示（按范围决定）。</Text>
+      </Box>
+    </Box>
+    <Box style={{ flex: 1, flexDirection: 'column', background: '#EFF6FF', borderRadius: 12, padding: '24px 24px' }}>
+      <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#1E3A8A' }}>后续改进方向</Text>
+      <Box style={{ flexDirection: 'column', gap: 12, marginTop: 18 }}>
+        <Text style={{ fontSize: 17, color: '#1E293B', lineHeight: 1.5 }}>① 接入 BGE / 向量检索，提升理论与证据的语义召回。</Text>
+        <Text style={{ fontSize: 17, color: '#1E293B', lineHeight: 1.5 }}>② 把已有接口接到 desk.html，补齐独立页面。</Text>
+        <Text style={{ fontSize: 17, color: '#1E293B', lineHeight: 1.5 }}>③ 完成 T13c 检索索引快照，支持「按当时清单重演」。</Text>
+        <Text style={{ fontSize: 17, color: '#1E293B', lineHeight: 1.5 }}>④ 开展 3–5 名设计师可用性测试，迭代交互。</Text>
+      </Box>
+    </Box>
+  </Box>
+</Slide>

@@ -1,0 +1,12 @@
+<Slide style={{ background: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 55%, #3B82F6 100%)', padding: '70px 80px' }}>
+  <Box style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+    <Text style={{ fontSize: 42, fontWeight: 'bold', color: '#FFFFFF', textAlign: 'center', lineHeight: 1.4 }}>你写，AI 查证把关；<br />你确认，决定才生效。</Text>
+    <Box style={{ width: 64, height: 4, background: '#F59E0B', borderRadius: 2, marginTop: 34, marginBottom: 34 }} />
+    <Text style={{ fontSize: 20, color: '#E0E7FF' }}>感谢观看 · 欢迎指正</Text>
+    <Box style={{ flexDirection: 'column', alignItems: 'center', marginTop: 44, gap: 10 }}>
+      <Text style={{ fontSize: 17, color: '#BFDBFE' }}>代码仓库：github.com/DomenRaven/sinuo-platform</Text>
+      <Text style={{ fontSize: 17, color: '#BFDBFE' }}>演示账号：synthetic-lead / synthetic-pass-lead</Text>
+      <Text style={{ fontSize: 15, color: '#93C5FD', marginTop: 6 }}>学号 3240103625 · 张玮勐 · 《设计大数据基础》</Text>
+    </Box>
+  </Box>
+</Slide>
