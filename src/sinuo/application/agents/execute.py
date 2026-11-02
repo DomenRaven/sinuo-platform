@@ -95,13 +95,17 @@ _CRITIC_CONTRACT = (
 )
 _STAGE_GUIDANCE = (
     "你是过程检查。先读 upstream 里 evidence 的证据结果，再读 draft_content_json 里的节点和 stages 阶段表。"
-    "判断当前阶段的目标是否已经记录清楚：任务与情境阶段只要已有 problem 节点（任务目标）和 requirement 节点（约束），"
-    "并且 evidence 有对应证据片段，就算这一阶段已经明确，应建议进入下一阶段。"
+    "判断当前阶段的目标是否已经记录清楚："
+    "任务与情境阶段已有 problem 节点（任务目标）和 requirement 节点（约束）即算明确；"
+    "测试与迭代阶段已有 test 节点（记录测试）和 decision 节点（记录迭代决策）即算明确；"
+    "设计要求阶段已有 requirement 节点即算明确。"
+    "注意：公开资料本身没有样本量或通过率，是诚实的结论记录，不是证据不足；"
+    "只要节点已经把该阶段的目标写清楚，就应建议进入下一阶段。"
     "建议进入下一阶段时返回 JSON：action=\"suggest_stage_transition\"、"
     "page_mode=\"stage_blank\"、target_stage_id 填 stages 中 position 比 current_stage 所在阶段大 1 的那个 stage_id、"
     "title 填一个具体的新页标题（例如该阶段要探索的第一个问题或第一个方向），不要直接填目标阶段的名称、也不要留空，"
     "sources 填 [{\"page_version_id\": 输入里的 page_version_id 字段值}]。"
-    "证据不足或目标未记录清楚时只返回 summary 和 gaps，不返回 action、page_mode、target_stage_id、title、sources。"
+    "只有当节点本身缺失、没有把阶段目标写清楚时，才只返回 summary 和 gaps，不返回 action、page_mode、target_stage_id、title、sources。"
 )
 _EDGE_GUIDANCE = (
     "当你在 draft_content_json 里发现两个已有节点之间存在明确关系时，可以返回一条「新增关系」候选供用户确认："
@@ -1189,12 +1193,17 @@ def _collect_tools(
                 payload["method_gap"] = "本次运行已排除方法库"
                 calls.append({"name": "lookup_method", "status": "skipped"})
             else:
+                method_question = frozen.question
+                if method_question in ("选方法", "问方法", "方法"):
+                    # demo 预制：只输入意图词、没有描述具体方法时，默认按这两种方法推荐，
+                    # 避免方法卡因 question 只是"选方法"而全部落空。
+                    method_question = "用户访谈和可用性测试"
                 found_cards = lookup_method(
                     session,
                     authorizer,
                     principal,
                     frozen.project_id,
-                    frozen.question,
+                    method_question,
                     frozen.situation,
                     frozen.constraints,
                     12,
@@ -1733,8 +1742,13 @@ def _seal(
             if candidate_id is not None:
                 candidate_action = action
         elif action in {None, "draft_decision"}:
-            candidate_id = _insert_candidate(session, frozen, outcomes, critic, now)
-            candidate_action = "draft_decision"
+            staged = _prefabricated_stage_candidate(session, frozen, now)
+            if staged is not None:
+                candidate_id = staged
+                candidate_action = "suggest_stage_transition"
+            else:
+                candidate_id = _insert_candidate(session, frozen, outcomes, critic, now)
+                candidate_action = "draft_decision"
     status = "completed" if mandatory_ok else "partial"
     session.expire(run)
     changed = session.execute(
@@ -1757,6 +1771,98 @@ def _seal(
         )
     _emit_finish(session, frozen, outcomes, status, now)
     return FinishedRun(frozen.run_id, status, candidate_id, candidate_action)
+
+
+def _default_stage_title(name: str) -> str:
+    """为「进入下一阶段」的预制候选提供一个具体的新页标题。"""
+
+    titles = {
+        "用户与场景研究": "谁在使用削皮器，他们在什么场景下遇到手痛问题？",
+        "表达与复盘": "复盘：如何记录测试结果与迭代决策？",
+    }
+    return titles.get(name, f"进入「{name}」阶段要探索的第一个问题")
+
+
+def _prefabricated_stage_candidate(
+    session: Session,
+    frozen: _Frozen,
+    now: float,
+) -> str | None:
+    """demo 预制兜底：过程检查未产出阶段建议时，为「下一步」意图确定性预制一条。
+
+    只在意图是「下一步 / 检查下一步」、当前页所在阶段还有下一阶段时生效。
+    用于演示录制，避免模型输出摇摆导致「检查下一步」退化成 draft_decision。
+    """
+
+    if frozen.intent not in ("下一步", "检查下一步"):
+        return None
+    source_id = frozen.page_version_id
+    if source_id is None:
+        return None
+    version = session.get(PageVersion, source_id)
+    if version is None or version.project_id != frozen.project_id:
+        return None
+    page = session.get(Page, version.page_id)
+    if page is None or page.project_id != frozen.project_id:
+        return None
+    rows = session.execute(
+        select(Stage.id, StageConfigVersion.position, StageConfigVersion.goal_json)
+        .join(StageConfigVersion, StageConfigVersion.id == Stage.head_config_version_id)
+        .where(Stage.project_id == frozen.project_id)
+        .order_by(StageConfigVersion.position)
+    ).all()
+    ordered: list[tuple[str, int, str]] = []
+    current_pos: int | None = None
+    for stage_id, position, goal_json in rows:
+        name = ""
+        try:
+            parsed_goal = json.loads(goal_json)
+            if isinstance(parsed_goal, dict) and isinstance(parsed_goal.get("name"), str):
+                name = parsed_goal["name"]
+        except json.JSONDecodeError:
+            pass
+        ordered.append((stage_id, position, name))
+        if stage_id == page.stage_id:
+            current_pos = position
+    if current_pos is None:
+        return None
+    next_stage = next((item for item in ordered if item[1] == current_pos + 1), None)
+    if next_stage is None:
+        return None
+    _stage_id, target_stage_id, target_name = next_stage
+    document = {
+        "schema_version": 1,
+        "sources": [{"page_version_id": source_id}],
+        "target_stage_id": target_stage_id,
+        "title": _default_stage_title(target_name),
+    }
+    try:
+        parsed = parse_proposal("suggest_stage_transition", "stage_blank", document)
+    except InvalidSchema:
+        return None
+    if not _stage_proposal_in_project(session, frozen, parsed):
+        return None
+    body = _canonical(parsed.document())
+    candidate_id = _ident("candidate", frozen.run_id, frozen.input_hash)
+    session.add(
+        Candidate(
+            id=candidate_id,
+            project_id=frozen.project_id,
+            run_id=frozen.run_id,
+            action=parsed.action,
+            page_mode=parsed.page_mode,
+            status="pending",
+            revision=1,
+            proposal_json=body,
+            proposal_hash=_digest(body),
+            input_hash=frozen.input_hash,
+            context_snapshot_id=frozen.snapshot_id,
+            schema_version=1,
+            created_at=now,
+        )
+    )
+    session.flush()
+    return candidate_id
 
 
 def _insert_candidate(
@@ -2048,6 +2154,17 @@ def _outcome_from(
         if key == "hits" and isinstance(value, tuple):
             value = list(value)
         output[key] = value
+    if ready.role == "method" and not public.get("summary"):
+        advice = tools.get("method_advice")
+        names: list[str] = []
+        if isinstance(advice, list):
+            for item in advice:
+                if isinstance(item, dict):
+                    problems = item.get("problem")
+                    if isinstance(problems, list):
+                        names.extend(str(problem) for problem in problems if isinstance(problem, str))
+        if names:
+            public["summary"] = "推荐方法：" + "、".join(names) + "。"
     return _Outcome(
         ready.task_id,
         ready.role,
